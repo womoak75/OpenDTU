@@ -4,6 +4,7 @@
 #include <Arduino.h>
 #include <ArduinoJson.h>
 #include "plugin.h"
+#include <LittleFS.h>
 
 #define PLUGINCONFIG_FILENAME "/pluginconfig.json"
 #define PLUGINCONFIG_VERSION 0x00011900 // 0.1.24 // make sure to clean all after change

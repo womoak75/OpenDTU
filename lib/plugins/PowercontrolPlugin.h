@@ -1,7 +1,7 @@
-#ifndef __POWERCONTROLPLUGIN_H__
-#define __POWERCONTROLPLUGIN_H__
+#pragma once
 
 #include "plugin.h"
+#include "pluginmessages.h"
 
 typedef struct {
     uint64_t inverterSerial = 0;
@@ -185,5 +185,3 @@ private:
     DefaultPowercontrolAlgo defaultAlgo = DefaultPowercontrolAlgo();
     PowercontrolAlgo* algo = &defaultAlgo;
 };
-
-#endif /*__POWERCONTROLPLUGIN_H__*/

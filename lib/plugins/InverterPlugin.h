@@ -1,7 +1,7 @@
-#ifndef __INVERTERPLUGIN_H__
-#define __INVERTERPLUGIN_H__
+#pragma once
 
 #include "plugin.h"
+#include "pluginmessages.h"
 #include <Hoymiles.h>
 
 #ifndef MAX_NUM_INVERTERS
@@ -221,5 +221,3 @@ public:
 private:
     inverterarray<MAX_NUM_INVERTERS> inverters;
 };
-
-#endif /*__INVERTERPLUGIN_H__*/

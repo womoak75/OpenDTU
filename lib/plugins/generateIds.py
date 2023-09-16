@@ -4,8 +4,9 @@ import sys
 
 def writeFile(outf,pluginlist,taglist):
     outfile = open(outf, "w")
-    outfile.write("#ifndef __PLUGINIDS_H__\n")
-    outfile.write("#define __PLUGINIDS_H__\n\n")
+    #outfile.write("#ifndef __PLUGINIDS_H__\n")
+    #outfile.write("#define __PLUGINIDS_H__\n\n")
+    outfile.write("#pragma once\n\n");
     outfile.write("#ifndef NDEBUG\n")
     generateIds(outfile, pluginlist)
     generateValueIds(outfile, pluginlist)
@@ -14,7 +15,7 @@ def writeFile(outf,pluginlist,taglist):
     #generateTagIdsString(outfile, taglist)
     outfile.write("#endif // NDEBUG\n")
     generateDebugFunction(outfile, pluginlist, taglist)
-    outfile.write("\n#endif /* __PLUGINIDS_H__ */\n")
+    #outfile.write("\n#endif /* __PLUGINIDS_H__ */\n")
     outfile.close
     
 def generateIds(f,plist):

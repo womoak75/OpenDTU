@@ -1,7 +1,7 @@
-#ifndef __METERPLUGIN_H__
-#define __METERPLUGIN_H__
+#pragma once
 
 #include "plugin.h"
+#include "pluginmessages.h"
 #include <map>
 #include <vector>
 
@@ -196,5 +196,3 @@ private:
     String meter_mqtt_topics;
     String meter_mqtt_json_topics;
 };
-
-#endif /*__METERPLUGIN_H__*/

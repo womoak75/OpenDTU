@@ -1,4 +1,4 @@
-// hm350 112 182 842 985
+
 #include "Plugins.h"
 #include "MessageOutput.h"
 #include "MqttSettings.h"
@@ -25,8 +25,8 @@ void PluginsClass::init()
     for (unsigned int i = 0; i < plugins.size(); i++) {
         plugins[i]->setSystem(this);
         PluginConfiguration.read(plugins[i]);
-        if (strlen(plugins[i]->name) > maxnamelen) {
-            maxnamelen = strlen(plugins[i]->name);
+        if (strlen(plugins[i]->getName()) > maxnamelen) {
+            maxnamelen = strlen(plugins[i]->getName());
         }
         start(plugins[i]);
     }
@@ -138,7 +138,7 @@ void PluginsClass::publish()
         qentry entry = q.front();
         auto sender = getPluginById(entry.pluginid);
         if (NULL != sender) {
-            snprintf(topic, sizeof(topic), "%s/%s", sender->name, (const char*)buffer + entry.topicindex);
+            snprintf(topic, sizeof(topic), "%s/%s", sender->getName(), (const char*)buffer + entry.topicindex);
             if (entry.appendtopic) {
                 MqttSettings.publish(topic, (const char*)buffer + entry.dataindex);
             } else {
@@ -173,7 +173,7 @@ Plugin* PluginsClass::getPluginById(int pluginid)
 Plugin* PluginsClass::getPluginByName(const char* pluginname)
 {
     for (unsigned int i = 0; i < plugins.size(); i++) {
-        if (strcmp(plugins[i]->name, pluginname) == 0) {
+        if (strcmp(plugins[i]->getName(), pluginname) == 0) {
             return plugins[i];
         }
     }

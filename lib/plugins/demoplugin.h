@@ -1,7 +1,7 @@
-#ifndef __DEMOPLUGIN_H__
-#define __DEMOPLUGIN_H__
+#pragma once
 
 #include "plugin.h"
+#include "pluginmessages.h"
 
 class demoPlugin : public Plugin
 {
@@ -94,5 +94,3 @@ public:
     float floatsetting = 23.0;
     char stringsetting[32] = "some default string";
 };
-
-#endif /*__DEMOPLUGIN_H__*/
