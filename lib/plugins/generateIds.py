@@ -11,6 +11,7 @@ def writeFile(outf,pluginlist,taglist):
     generateIds(outfile, pluginlist)
     generateValueIds(outfile, pluginlist)
     generateValueIdsString(outfile,pluginlist)
+    outfile.flush();
     generateTagIds(outfile, taglist)
     #generateTagIdsString(outfile, taglist)
     outfile.write("#endif // NDEBUG\n")
@@ -153,18 +154,38 @@ def parseFileEnum(fin):
     else:
         return None
 
+def getRecFilesDir(dir):
+    subfolders = [ dir+'/'+f.name for f in os.scandir(dir) if f.is_dir() ]
+    return subfolders
+
+def getFilesDir(dir):
+    files = os.listdir(dir)
+    files = [dir+'/'+f for f in files if os.path.isfile(dir+'/'+f) & f.endswith('h')] 
+    return files;
+
+def getAllFiles(dir):
+    files = getFilesDir(dir)
+    subdirs = getRecFilesDir(dir)
+    for d in subdirs:
+        files.extend(getFilesDir(d))
+    return files
 
 try:
     scriptdir = os.path.dirname(os.path.abspath(__file__))
 except NameError:
     approot = os.path.dirname(os.path.abspath(sys.argv[1]))
-    scriptdir = os.path.join(approot, 'lib/plugins')
-genfilename = 'pluginids.h'  
-gendir = scriptdir+'/'+genfilename                 
-print(scriptdir)
+    scriptdir = os.path.join(approot, 'lib/plugins/')
 
-files = os.listdir(scriptdir)
-files = [scriptdir+'/'+f for f in files if os.path.isfile(scriptdir+'/'+f) & f.endswith('h')] 
+genfilename = 'pluginids.h'  
+gendir = scriptdir + 'src/base/'             
+sourcedir = scriptdir + 'src/'    
+genfile = gendir + genfilename         
+print('scan for sourcefiles in '+sourcedir)
+print('generating file: '+genfile)
+
+#files = os.listdir(scriptdir)
+#files = [scriptdir+'/'+f for f in files if os.path.isfile(scriptdir+'/'+f) & f.endswith('h')] 
+files = getAllFiles(sourcedir)
 print(*files, sep="\n")
 pluginlist = list()
 taglist = None
@@ -178,4 +199,4 @@ for f in files:
     if tags != None:
         print(tags)
         taglist = tags.split(",")
-writeFile(gendir,pluginlist,taglist)
+writeFile(genfile,pluginlist,taglist)

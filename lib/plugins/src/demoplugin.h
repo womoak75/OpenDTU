@@ -1,7 +1,7 @@
 #pragma once
 
-#include "plugin.h"
-#include "pluginmessages.h"
+#include "base/plugin.h"
+#include "messages/demomessage.h"
 
 class demoPlugin : public Plugin
 {
@@ -15,12 +15,13 @@ public:
     }
     void onTickerSetup() {
         MessageOutput.println("demoplugin:onTickerSetup()");
-        /*
+        
         addTimerCb(SECOND, 3, [this]() { 
-            PluginMessage m(*this);
-            m.addList(FloatValue(SOMEVALUE, (float)42.0),StringValue(SOMEOTHERVALUE, "blah blub")); 
+            DemoMessage m;
+            m.setSomeValue(08.15f);
             publishMessage(m);
         },"demoplugintimer1");
+        /* 
         addTimerCb(SECOND, 4, [this]() {
             enqueueMessage((char*)"out",(char*)"hello world!",false);
             enqueueMessage((char*)"out",(char*)"hello world!"); 

@@ -3,8 +3,6 @@
 #include "Hoymiles.h"
 #include "globals.h"
 #include "pluginmessages.h"
-#include "mqttmessage.h"
-#include "invertermessage.h"
 #include "system.h"
 #include <ArduinoJson.h>
 #include <functional>
@@ -40,22 +38,7 @@ public:
    * @param app - pointer to ahoi app
    */
   virtual void loop();
-  /**
-   * inverterCallback
-   *
-   * will be called at end of Inverter.addValue(...)
-   *
-   *  @param InverterMessage
-   */
-  virtual void inverterCallback(const InverterMessage *message);
-  /**
-   * mqttCallback
-   *
-   * will be called at end of app::cbMqtt
-   *
-   *  @param MqttMessage
-   */
-  virtual void mqttCallback(const MqttMessage *message);
+
   /**
    * internalCallback
    *

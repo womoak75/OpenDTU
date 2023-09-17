@@ -33,22 +33,6 @@ void Plugin::setup() {}
  * @param app - pointer to ahoi app
  */
 void Plugin::loop() {}
-/**
- * inverterCallback
- *
- * will be called at end of Inverter.addValue(...)
- *
- *  @param InverterMessage
- */
-void Plugin::inverterCallback(const InverterMessage *message) {}
-/**
- * mqttCallback
- *
- * will be called at end of app::cbMqtt
- *
- *  @param MqttMessage
- */
-void Plugin::mqttCallback(const MqttMessage *message) {}
 
 void Plugin::internalCallback(std::shared_ptr<PluginMessage> message) {}
 

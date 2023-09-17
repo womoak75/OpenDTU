@@ -1,7 +1,9 @@
 #pragma once
 
-#include "plugin.h"
-#include "pluginmessages.h"
+#include "base/plugin.h"
+#include "base/pluginmessages.h"
+#include "messages/metermessage.h"
+#include "messages/invertermessage.h"
 
 typedef struct {
     uint64_t inverterSerial = 0;
@@ -116,11 +118,29 @@ public:
     void internalCallback(std::shared_ptr<PluginMessage> message)
     {
         MessageOutput.printf("powercontrol internalCallback: %d\n", message->getSenderId());
+        if(message->isMessageType<InverterMessage>()) {
+           // InverterMessage* m = (InverterMessage*)message.get();
+            MessageOutput.printf("powercontrol ***************\n");
+          //  MessageOutput.printf("** %s -> %f W\n",m->inverterStringSerial.c_str(),m->value);
+        }
+    }
+
+    void handleInverterMessage(InverterMessage& message) {
+            powercontrolstruct* powercontrol = powercontrollers.getInverterByStringSerial(message.inverterStringSerial);
+            if (powercontrol) {
+                powercontrol->production = message.value;
+                powercontrol->update = true;
+                MessageOutput.printf("powercontrol got production: %f\n", powercontrol->production);
+            } else {
+                MessageOutput.printf("powercontrol inverterSerial(%s) not configured\n", message.inverterStringSerial.c_str());
+            }
     }
 
     void internalDataCallback(PluginMessage* message)
     {
         // DBGPRINTMESSAGELN(DBG_INFO,"powercontroller",message);
+
+
         if (message->has(PluginIds::PluginMeter, PluginMeterIds::METER_POWER)) {
             String meterserial = message->getDataAs<StringValue>(PluginMeterIds::METER_SERIAL).value;
             powercontrolstruct* powercontrol = powercontrollers.getMeterByStringSerial(meterserial);
@@ -132,15 +152,7 @@ public:
                 MessageOutput.printf("powercontrol meterserial(%s) not configured\n", meterserial.c_str());
             }
         } else if (message->has(PluginIds::PluginInverter, PluginInverterIds::ACPOWER_PRODUCTION)) {
-            String inverterSerial = message->getDataAs<StringValue>(PluginInverterIds::ACPOWER_INVERTERSTRING).value;
-            powercontrolstruct* powercontrol = powercontrollers.getInverterByStringSerial(inverterSerial);
-            if (powercontrol) {
-                powercontrol->production = message->getDataAs<FloatValue>(PluginInverterIds::ACPOWER_PRODUCTION).value;
-                powercontrol->update = true;
-                MessageOutput.printf("powercontrol got production: %f\n", powercontrol->production);
-            } else {
-                MessageOutput.printf("powercontrol inverterSerial(%s) not configured\n", inverterSerial.c_str());
-            }
+
         } else {
             MessageOutput.printf("powercontrol unhandled message from sender=%d\n", message->getSenderId());
         }

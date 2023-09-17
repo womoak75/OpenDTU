@@ -1,7 +1,8 @@
 #pragma once
 
-#include "plugin.h"
-#include "pluginmessages.h"
+#include "base/plugin.h"
+#include "messages/metermessage.h"
+#include "messages/mqttmessage.h"
 #include <map>
 #include <vector>
 
@@ -135,9 +136,9 @@ public:
     void publishAC(Meter& meter)
     {
         MessageOutput.printf("meterplugin: publishPower[%s]: %f W \n", meter.getSerial().c_str(), meter.getPower());
-        PluginMessage m(*this);
-        m.add(FloatValue(METER_POWER, meter.getPower()));
-        m.add(StringValue(METER_SERIAL, meter.getSerial()));
+        MeterMessage m(*this);
+        m.setPowerValue(meter.getPower());
+        m.setMeterSerial(meter.getSerial());
         publishMessage(m);
     }
     void saveSettings(JsonObject settings)

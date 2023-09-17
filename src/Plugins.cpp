@@ -84,11 +84,11 @@ void PluginsClass::subscribeMqtt(Plugin* plugin, char* topic, bool append)
     //   MessageOutput.printf("PluginsClass::subscribeMqtt %s: %s\n", plugin->name, topic);
     MqttSettings.subscribe(topic, 0, [plugin](const espMqttClientTypes::MessageProperties& properties, const char* topic, const uint8_t* payload, size_t len, size_t index, size_t total) {
         //       MessageOutput.printf("PluginsClass::mqttCb topic=%s\n", topic);
-        MqttMessage m;
+        MqttMessage m(plugin->getId());
         m.topic = topic;
         m.payload = payload;
         m.length = len;
-        plugin->mqttCallback(&m);
+        plugin->internalDataCallback(&m);
     });
 }
 

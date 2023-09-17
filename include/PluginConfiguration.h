@@ -3,7 +3,7 @@
 
 #include <Arduino.h>
 #include <ArduinoJson.h>
-#include "plugin.h"
+#include "base/plugin.h"
 #include <LittleFS.h>
 
 #define PLUGINCONFIG_FILENAME "/pluginconfig.json"

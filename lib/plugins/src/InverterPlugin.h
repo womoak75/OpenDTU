@@ -1,7 +1,7 @@
 #pragma once
 
-#include "plugin.h"
-#include "pluginmessages.h"
+#include "base/plugin.h"
+#include "messages/invertermessage.h"
 #include <Hoymiles.h>
 
 #ifndef MAX_NUM_INVERTERS
@@ -114,14 +114,9 @@ public:
                 inv->Statistics()->getChannelFieldValue(type, channel, fieldId),
                 static_cast<unsigned int>(inv->Statistics()->getChannelFieldDigits(type, channel, fieldId)));
             value.trim();
-            InverterMessage message;
-            message.inverterSerial = inv.get()->serial();
-            message.inverterStringSerial = inv.get()->serialString();
-            message.fieldId = fieldId;
-            message.channelType = type;
-            message.channelNumber = channel;
-            message.value = value.toFloat();
-            inverterCallback(&message);
+           
+            // use internal callback
+            inverterCallback(fieldId,channel,inv->serial(),inv->serialString(),value.toFloat());
         }
     }
 
@@ -170,26 +165,30 @@ public:
     void publishAC(inverterstruct& inverter)
     {
         MessageOutput.printf("inverterplugin: publishAC[%s]: %f\n", inverter.serialString.c_str(), inverter.actpower);
-        PluginMessage m(*this);
-        m.add(FloatValue(ACPOWER_PRODUCTION, inverter.actpower));
-        m.add(LongValue(ACPOWER_INVERTER, inverter.serial));
-        m.add(StringValue(ACPOWER_INVERTERSTRING, inverter.serialString));
-        publishMessage(m);
+        // PluginMessage m(*this);
+        // m.add(FloatValue(ACPOWER_PRODUCTION, inverter.actpower));
+        // m.add(LongValue(ACPOWER_INVERTER, inverter.serial));
+        // m.add(StringValue(ACPOWER_INVERTERSTRING, inverter.serialString));
+         InverterMessage message(*this);
+            message.inverterSerial = inverter.serial;
+            message.inverterStringSerial = inverter.serialString;
+            message.value = inverter.actpower;
+        publishMessage(message);
     }
-    void inverterCallback(const InverterMessage* message)
+    void inverterCallback(int fieldId, int channelNumber, uint64_t inverterSerial, String inverterStringSerial, float value)
     {
-        if (message->fieldId == FieldId_t::FLD_PAC && message->channelNumber == ChannelNum_t::CH0) {
-            MessageOutput.printf("inverterplugin: new ac power: %f\n", message->value);
-            inverterstruct* index = inverters.getInverterByLongSerial(message->inverterSerial);
+        if (fieldId == FieldId_t::FLD_PAC && channelNumber == ChannelNum_t::CH0) {
+            MessageOutput.printf("inverterplugin: new ac power: %f\n", value);
+            inverterstruct* index = inverters.getInverterByLongSerial(inverterSerial);
             if (index == nullptr) {
-                index = addInverter(message->inverterSerial, message->inverterStringSerial);
+                index = addInverter(inverterSerial, inverterStringSerial);
             }
             if (index == nullptr) {
-                MessageOutput.printf("InverterPlugin: warning! no inverter with serial %s found\n", message->inverterStringSerial.c_str());
+                MessageOutput.printf("InverterPlugin: warning! no inverter with serial %s found\n", inverterStringSerial.c_str());
                 return;
             }
-            MessageOutput.printf("inverterplugin: update inverter.acpower[%s]: %f\n", message->inverterStringSerial.c_str(), message->value);
-            setInverterPower(index, message->value);
+            MessageOutput.printf("inverterplugin: update inverter.acpower[%s]: %f\n", inverterStringSerial.c_str(), value);
+            setInverterPower(index, value);
         }
     }
     void internalDataCallback(PluginMessage* message)

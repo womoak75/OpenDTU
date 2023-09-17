@@ -1,8 +1,10 @@
 #pragma once
 
-#include "plugintypes.h"
-#include "plugin.h"
-#include "pluginids.h"
+#include "base/plugintypes.h"
+#include "base/plugin.h"
+#if __has_include("base/pluginids.h")
+    #include "base/pluginids.h"
+#endif
 
 class Plugin;
 
@@ -31,7 +33,6 @@ class MetaData : public ContainerMap<METADATA_TAGS,Entity> {
 };
 
 class EntityError {};
-
 
 class PluginMessage :  public ContainerVector<Entity>, public Entity {
 
@@ -74,6 +75,17 @@ class PluginMessage :  public ContainerVector<Entity>, public Entity {
                 return getAs<T>(i).value;
         }
         throw(EntityError());
+    }
+    template <typename U>
+    bool isMessageType()
+    {
+        return (EntityIds<U>::type_id == type_id);
+    }
+    template <typename U>
+    U& getMessageAs()
+    {
+        auto v = std::static_pointer_cast<U>(this);
+        return *v.get();
     }
     protected:
     MetaData headers;
