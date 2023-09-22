@@ -5,7 +5,7 @@
 #include "base/plugin.h"
 #include "base/pluginmessagepublisher.h"
 #include <cstdint>
-#include <queue>
+#include <ThreadSafeQueue.h>
 #include <Every.h>
 
 #define THIRDPARTY_MSG_BUFFERSIZE 1024
@@ -30,8 +30,8 @@ public:
     
 private:
     void addPlugin(Plugin* p);
-    void publishToReceiver(PluginMessage* mes);
-    void publishToAll(PluginMessage* message);
+    void publishToReceiver(std::shared_ptr<PluginMessage> mes);
+    void publishToAll(std::shared_ptr<PluginMessage> message);
     void publishInternal();
     void publish();
 
@@ -56,7 +56,7 @@ private:
         std::function<void(void)> timerCb;
     } timerentry;
     std::vector<timerentry> timercbs;
-    std::queue<std::shared_ptr<PluginMessage>> msgs;
+    ThreadSafeQueue<std::shared_ptr<PluginMessage>> msgs;
     PluginMessagePublisher publisher;
 };
 

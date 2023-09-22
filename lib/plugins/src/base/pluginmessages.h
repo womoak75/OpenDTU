@@ -33,47 +33,20 @@ class MetaData : public ContainerMap<METADATA_TAGS,Entity> {
 
 class EntityError {};
 
-class PluginMessage :  public ContainerVector<Entity>, public Entity {
+class PluginMessage : public Entity {
 
     public:
     PluginMessage(Plugin &p);
     PluginMessage(TYPEIDS tid, int senderId);
     PluginMessage(TYPEIDS tid, Plugin &p);
 
-    //PluginMessage(int senderid) : PluginMessage(senderid,0) { }
-    MetaData& getMetaData() { return headers; }
-    bool hasData() { return (entities.size()>0);}
     bool from(int senderid) {
-        return (headers.getSenderId()==senderid);
+        return (this->senderId==senderid);
     }
-    int getSenderId() { return headers.getSenderId(); }
-    int getReceiverId() { return headers.getReceiverId(); }
-    bool has(int senderid, int dataid) {
-        return (from(senderid)&&hasDataId(dataid));
-    }
-    bool hasDataId(int id) {
-        for(unsigned int i=0; i < getEntryCount() ; i++) {
-            if(get(i).getId()==id)
-                return true;
-        }
-        return false;
-    }
-    template <typename T>
-    void addTag(METADATA_TAGS tag, T &e) {
-        headers.addTag(tag,e);
-    }
-    template <typename T>
-    void addTag(METADATA_TAGS tag, T &&e) {
-        headers.addTag(tag,std::move(e));
-    }
-    template <typename T>
-    T getDataAs(int dataid) {
-        for(unsigned int i=0; i < getEntryCount() ; i++) {
-            if(get(i).getId()==dataid)
-                return getAs<T>(i).value;
-        }
-        throw(EntityError());
-    }
+    int getSenderId() { return senderId; }
+    int getReceiverId() { return receiverId; }
+    void setReceiverId(int id) { receiverId = id; }
+    virtual void toString(char* buffer);
     template <typename U>
     bool isMessageType()
     {
@@ -86,6 +59,12 @@ class PluginMessage :  public ContainerVector<Entity>, public Entity {
         return *v.get();
     }
     protected:
-    MetaData headers;
+    void setSenderId(int id) {
+
+    }
+    private:
+    int senderId = 0;
+    int receiverId = 0;
+    long ts = millis();
  };
 

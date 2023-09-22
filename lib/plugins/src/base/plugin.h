@@ -47,15 +47,7 @@ public:
    *
    *  @param PluginMessage
    */
-  virtual void internalDataCallback(PluginMessage *message) = 0;
-  /**
-   * internalCallback
-   *
-   * will be called from 'system'
-   *
-   *  @param PluginMessage
-   */
-  virtual void internalCallback(std::shared_ptr<PluginMessage> message);
+  virtual void internalCallback(std::shared_ptr<PluginMessage> message) = 0;
   /**
    * called when json message was posted to /thirdpartyplugins.
    * message must contain either 'pluginid' or 'pluginname'.

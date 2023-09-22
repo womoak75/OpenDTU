@@ -26,6 +26,7 @@ public:
     }
     virtual ~Entity() { }
     virtual int getId() { return _id; }
+protected:
     int type_id;
     int _id;
 };
