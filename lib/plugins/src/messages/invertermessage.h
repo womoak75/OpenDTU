@@ -5,7 +5,8 @@
 class InverterMessage : public PluginMessage
 {
 public:
-    InverterMessage(Plugin& p) : PluginMessage(p) { type_id = TYPEIDS::INVERTERMESSAGE_TYPE;}
+    InverterMessage(Plugin& p) : PluginMessage(TYPEIDS::INVERTERMESSAGE_TYPE,p) {}
+    ~InverterMessage() {}
     uint64_t inverterSerial;
     String inverterStringSerial;
     int channelNumber;

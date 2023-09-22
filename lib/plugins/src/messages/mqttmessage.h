@@ -5,7 +5,10 @@
 class MqttMessage : public PluginMessage
 {
 public:
-    MqttMessage(int receiverId) : PluginMessage(0,receiverId) {}
+    MqttMessage(int senderId,int receiverId) : PluginMessage(TYPEIDS::MQTTMESSAGE_TYPE,senderId) {
+        headers.setReceiverId(receiverId);
+    }
+    ~MqttMessage() {}
     const char *topic;
     const uint8_t *payload;
     unsigned int length;

@@ -119,9 +119,9 @@ public:
     {
         MessageOutput.printf("powercontrol internalCallback: %d\n", message->getSenderId());
         if(message->isMessageType<InverterMessage>()) {
-           // InverterMessage* m = (InverterMessage*)message.get();
+            InverterMessage* m = (InverterMessage*)message.get();
             MessageOutput.printf("powercontrol ***************\n");
-          //  MessageOutput.printf("** %s -> %f W\n",m->inverterStringSerial.c_str(),m->value);
+            MessageOutput.printf("** %s -> %f W\n",m->inverterStringSerial.c_str(),m->value);
         }
     }
 

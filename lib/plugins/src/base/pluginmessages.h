@@ -1,7 +1,6 @@
 #pragma once
 
 #include "base/plugintypes.h"
-#include "base/plugin.h"
 #if __has_include("base/pluginids.h")
     #include "base/pluginids.h"
 #endif
@@ -21,9 +20,9 @@ class MetaData : public ContainerMap<METADATA_TAGS,Entity> {
     bool hasTag(METADATA_TAGS id) {
         return hasKey(id);
     }
+    void setReceiverId(int id) { add(METADATA_TAGS::RECEIVERID,IntValue(0,id)); }
     protected:
     void setSenderId(int id) { add(METADATA_TAGS::SENDERID,IntValue(0,id)); }
-    void setReceiverId(int id) { add(METADATA_TAGS::RECEIVERID,IntValue(0,id)); }
     template <typename T>
     void addTag(METADATA_TAGS id, T tag) {
         add(id,tag);
@@ -37,11 +36,10 @@ class EntityError {};
 class PluginMessage :  public ContainerVector<Entity>, public Entity {
 
     public:
-    PluginMessage(int senderid, int receiverid);
-    PluginMessage(int senderid);
-    PluginMessage(Plugin &plugin);
+    PluginMessage(Plugin &p);
+    PluginMessage(TYPEIDS tid, int senderId);
+    PluginMessage(TYPEIDS tid, Plugin &p);
 
-    PluginMessage(const PluginMessage &v) = default;
     //PluginMessage(int senderid) : PluginMessage(senderid,0) { }
     MetaData& getMetaData() { return headers; }
     bool hasData() { return (entities.size()>0);}

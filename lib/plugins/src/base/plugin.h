@@ -16,12 +16,13 @@
 class Plugin {
 public:
   Plugin(int _id, const char *_name);
+  ~Plugin() {}
   int getId();
   const char *getName();
   bool isEnabled();
   void loadPluginSettings(JsonObject s);
   void savePluginSettings(JsonObject s);
-  void setSystem(System *s);
+  void setSystem(System<Plugin> *s);
   /**
    * setup
    *
@@ -89,6 +90,8 @@ public:
    * @param settings - jsonobject for plugin config
    */
   virtual void saveSettings(JsonObject settings);
+
+protected:
   /**
    * subscribe mqtt topic.
    * use: onMqttSubscribe()
@@ -108,6 +111,18 @@ public:
    * @return true if message was queued successful - false otherwise
    */
   bool enqueueMessage(char *topic, char *data, bool append = true);
+
+  /**
+   * @brief add timer callback.
+   *
+   * @param intvaltype - MINUTE / SECOND
+   * @param interval
+   * @param timerCb - callback function
+   * @param timername
+   */
+  void addTimerCb(PLUGIN_TIMER_INTVAL intvaltype, uint32_t interval,
+                  std::function<void(void)> timerCb, const char *timername);
+
   // void publishInternalValues(IdEntity...  &elements) {
   //     if (system)
   //     {
@@ -120,21 +135,16 @@ public:
    * @param valueid - value identifier
    * @param value
    */
-  void publishMessage(PluginMessage &message);
-  /**
-   * @brief add timer callback.
-   *
-   * @param intvaltype - MINUTE / SECOND
-   * @param interval
-   * @param timerCb - callback function
-   * @param timername
-   */
-  void addTimerCb(PLUGIN_TIMER_INTVAL intvaltype, uint32_t interval,
-                  std::function<void(void)> timerCb, const char *timername);
+  template <typename T>
+  void publishMessage(T &message) {
+    if (system) {
+       system->getPublisher().publish(message);
+    }
+  }
 
 private:
   int id;
   const char *name;
-  System *system = nullptr;
+  System<Plugin> *system = nullptr;
   bool enabled = false;
 };

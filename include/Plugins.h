@@ -3,22 +3,24 @@
 
 
 #include "base/plugin.h"
+#include "base/pluginmessagepublisher.h"
 #include <cstdint>
 #include <queue>
 #include <Every.h>
 
-
-
 #define THIRDPARTY_MSG_BUFFERSIZE 1024
 
-class PluginsClass : public System {
+class PluginsClass : public System<Plugin> {
 public:
+    PluginsClass() : publisher(msgs) {}
+    ~PluginsClass() {}
     void init();
     void loop();
     void subscribeMqtt(Plugin* plugin, char* topic, bool append);
     void ctrlRequest(Plugin* plugin, JsonObject ctrlRequest);
     bool enqueueMessage(Plugin* sender, char* topic, char* data, bool append);
-    void publishMessage(Plugin* sender, PluginMessage& message);
+    PluginMessagePublisher& getPublisher();
+    //void publishMessage(Plugin* sender, PluginMessage& message);
     void addTimerCb(Plugin* plugin, const char* timername, PLUGIN_TIMER_INTVAL intval, uint32_t interval, std::function<void(void)> timerCb);
     Plugin* getPluginByIndex(int pluginindex);
     Plugin* getPluginById(int pluginid);
@@ -55,6 +57,7 @@ private:
     } timerentry;
     std::vector<timerentry> timercbs;
     std::queue<std::shared_ptr<PluginMessage>> msgs;
+    PluginMessagePublisher publisher;
 };
 
 extern PluginsClass Plugins;

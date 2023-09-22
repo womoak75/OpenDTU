@@ -4,7 +4,7 @@
 
 class DemoMessage : public PluginMessage {
     public:
-    DemoMessage() : PluginMessage(0,0) {
+    DemoMessage(Plugin& p) : PluginMessage(TYPEIDS::DEMOMESSAGE_TYPE,p) {
     }
     void setSomeValue(float f) {
         add(FloatValue(232324, f));

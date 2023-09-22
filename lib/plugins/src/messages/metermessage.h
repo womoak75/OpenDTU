@@ -4,8 +4,9 @@
 
 class MeterMessage : public PluginMessage {
     public:
-    MeterMessage(Plugin& p) : PluginMessage(p) {
+    MeterMessage(Plugin& p) : PluginMessage(TYPEIDS::METERMESSAGE_TYPE,p) {
     }
+    ~MeterMessage() {}
     void setPowerValue(float power) {
         add(FloatValue(METER_POWER, power));
     }

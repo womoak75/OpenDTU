@@ -62,6 +62,7 @@ void PluginsClass::loop()
             }
         }
     }
+    EVERY_N_SECONDS(5) { MessageOutput.printf("PluginsClass main loop! **\n"); }
     publishInternal();
     for (unsigned int i = 0; i < plugins.size(); i++) {
         if (plugins[i]->isEnabled()) {
@@ -84,7 +85,7 @@ void PluginsClass::subscribeMqtt(Plugin* plugin, char* topic, bool append)
     //   MessageOutput.printf("PluginsClass::subscribeMqtt %s: %s\n", plugin->name, topic);
     MqttSettings.subscribe(topic, 0, [plugin](const espMqttClientTypes::MessageProperties& properties, const char* topic, const uint8_t* payload, size_t len, size_t index, size_t total) {
         //       MessageOutput.printf("PluginsClass::mqttCb topic=%s\n", topic);
-        MqttMessage m(plugin->getId());
+        MqttMessage m(0,plugin->getId());
         m.topic = topic;
         m.payload = payload;
         m.length = len;
@@ -112,11 +113,7 @@ bool PluginsClass::enqueueMessage(Plugin* sender, char* topic, char* data, bool 
     q.push(entry);
     return true;
 }
-void PluginsClass::publishMessage(Plugin* sender, PluginMessage& message)
-{
-    // MessageOutput.printf("plugins::publishMessage sender=%d receiver=%d\n", sender->getId(),message.getReceiverId());
-    msgs.push(std::make_shared<PluginMessage>(message));
-}
+
 void PluginsClass::addTimerCb(Plugin* plugin, const char* timername, PLUGIN_TIMER_INTVAL intval, uint32_t interval, std::function<void(void)> timerCb)
 {
     // MessageOutput.printf("PluginsClass::addTimerCb sender=%d\n", plugin->getId());
@@ -200,7 +197,7 @@ void PluginsClass::publishToReceiver(PluginMessage* mes)
 
 void PluginsClass::publishToAll(PluginMessage* message)
 {
-    //   MessageOutput.printf("plugins publishToAll sender=%d\n",message->getSenderId());
+    //MessageOutput.printf("plugins publishToAll sender=%d\n",message->getSenderId());
     int pluginid = message->getSenderId();
     for (unsigned int i = 0; i < plugins.size(); i++) {
         if (plugins[i]->getId() != pluginid) {
@@ -217,13 +214,14 @@ void PluginsClass::publishInternal()
     while (!msgs.empty()) {
         auto message = msgs.front();
         if (message->hasData()) {
-            // MessageOutput.printf("plugins publishInternal sender=%d\n",message->getSenderId());
+            //MessageOutput.printf("plugins publishInternal sender=%d\n",message->getSenderId());
             if (message->getReceiverId() != 0) {
                 publishToReceiver(message.get());
             } else {
                 publishToAll(message.get());
             }
         } else {
+            //MessageOutput.printf("plugins internalCallback sender=%d\n",message->getSenderId());
             int pluginid = message.get()->getSenderId();
             for (unsigned int i = 0; i < plugins.size(); i++) {
                 if (plugins[i]->getId() != pluginid) {
@@ -237,3 +235,10 @@ void PluginsClass::publishInternal()
         message.reset();
     }
 }
+
+    PluginMessagePublisher& PluginsClass::getPublisher() {
+        return publisher;
+    }
+
+
+

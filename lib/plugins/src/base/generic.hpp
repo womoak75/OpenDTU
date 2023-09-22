@@ -65,6 +65,8 @@ template <typename BASE>
 class ContainerVector {
 
 public:
+    ContainerVector() {}
+    ~ContainerVector() {}
     template <class U>
     void add(U&& v)
     {

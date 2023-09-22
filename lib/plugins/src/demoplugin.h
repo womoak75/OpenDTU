@@ -17,7 +17,7 @@ public:
         MessageOutput.println("demoplugin:onTickerSetup()");
         
         addTimerCb(SECOND, 3, [this]() { 
-            DemoMessage m;
+            DemoMessage m(*this);
             m.setSomeValue(08.15f);
             publishMessage(m);
         },"demoplugintimer1");

@@ -16,7 +16,7 @@ void Plugin::loadPluginSettings(JsonObject s) {
   }
 }
 void Plugin::savePluginSettings(JsonObject s) { s[F("enabled")] = enabled; }
-void Plugin::setSystem(System *s) { system = s; }
+void Plugin::setSystem(System<Plugin> *s) { system = s; }
 /**
  * setup
  *
@@ -61,11 +61,6 @@ bool Plugin::enqueueMessage(char *topic, char *data, bool append) {
   return false;
 }
 
-void Plugin::publishMessage(PluginMessage &message) {
-  if (system) {
-    system->publishMessage(this, message);
-  }
-}
 
 void Plugin::addTimerCb(PLUGIN_TIMER_INTVAL intvaltype, uint32_t interval,
                         std::function<void(void)> timerCb,
