@@ -13,7 +13,7 @@ public:
   int toString(char *buffer) {
     int c = sprintf(buffer, "PowerControlMessage{base=");
     c = c + PluginMessage::toString(buffer+c);
-    c = c + sprintf(buffer+c,"}");
+    c = c + sprintf(buffer+c,", serialStr=%s, serial=%llu, power=%f}",serialString.c_str(),serial,power);
     return c;
   }
 };

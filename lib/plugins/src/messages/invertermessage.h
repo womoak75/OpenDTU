@@ -22,7 +22,7 @@ public:
   int toString(char *buffer) {
     int c = sprintf(buffer, "InverterMessage{base=");
     c = c + PluginMessage::toString(buffer+c);
-    c = c + sprintf(buffer+c,"}");
+    c = c + sprintf(buffer+c,", id=%llu, idStr=%s, power=%f}",inverterSerial,inverterStringSerial.c_str(),value);
     return c;
   }
 };

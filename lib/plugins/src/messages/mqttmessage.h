@@ -35,7 +35,7 @@ public:
   int toString(char *buffer) {
     int c = sprintf(buffer, "MqttMessage{base=");
     c = c + PluginMessage::toString(buffer+c);
-    c = c + sprintf(buffer+c,"}");
+    c = c + sprintf(buffer+c," topic=%s, data=%s, append=%d}",topic.get(),payloadToChar().get(),appendTopic);
     return c;
   }
 };

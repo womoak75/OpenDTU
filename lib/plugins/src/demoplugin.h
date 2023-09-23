@@ -16,7 +16,7 @@ public:
         SECOND, 5,
         [&]() {
           DemoMessage m(*this);
-          m.setSomeValue(08.15f);
+          m.somevalue = 08.15f;
           publishMessage(m);
           MqttMessage mqtt(getId(),PluginIds::PluginPublish);
           mqtt.setMqtt("public/mqtt",(const uint8_t*)"{hello world}",13);

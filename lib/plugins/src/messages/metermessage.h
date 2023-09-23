@@ -12,7 +12,7 @@ public:
   int toString(char *buffer) {
     int c = sprintf(buffer, "MeterMessage{base=");
     c = c + PluginMessage::toString(buffer+c);
-    c = c + sprintf(buffer+c,"}");
+    c = c + sprintf(buffer+c,", meterid=%s, power=%f}",serial.c_str(),power);
     return c;
   }
 };
