@@ -11,28 +11,33 @@ public:
   ~MqttMessage() {
 
   }
-  const char *topic;
-  const uint8_t *payload;
+  MqttMessage(const MqttMessage& m) = default;
+  std::shared_ptr<char[]> topic;
+  std::shared_ptr<uint8_t[]> payload;
   unsigned int length;
   bool appendTopic = true;
-  void setMqtt(const char *topic, const uint8_t *payload, size_t len) {
-    inlen = len;
-    intopic = std::shared_ptr<char[]>(new char[strlen(topic)+1], std::default_delete<char[]>());
-    strcpy(intopic.get(), topic);
+  void setMqtt(const char *ttopic, const uint8_t *data, size_t len) {
+    length = len;
+    topic = std::shared_ptr<char[]>(new char[strlen(ttopic)+1], std::default_delete<char[]>());
+    strcpy(topic.get(), ttopic);
     // hack
-    indata = std::shared_ptr<uint8_t[]>(new uint8_t[len+1] , std::default_delete<uint8_t[]>());
-    indata[len]='\0';
-    memcpy(indata.get(), payload, len);
+    payload = std::shared_ptr<uint8_t[]>(new uint8_t[len] , std::default_delete<uint8_t[]>());
+    memcpy(payload.get(), data, len);
   }
 
-  void toString(char *buffer) {
-    sprintf(buffer, "MqttMessage{sender:%d, receiver:%d, type:%d}",
-            getSenderId(), getReceiverId(), type_id);
+  std::shared_ptr<char[]> payloadToChar() {
+    auto s = std::shared_ptr<char[]>(new char[length+1], std::default_delete<char[]>());
+    s[length]='\0';
+    memcpy(s.get(),payload.get(),length);
+    return s;
   }
-
-  std::shared_ptr<char[]> intopic;
-  std::shared_ptr<uint8_t[]> indata;
-  unsigned int inlen = 0;
+  
+  int toString(char *buffer) {
+    int c = sprintf(buffer, "MqttMessage{base=");
+    c = c + PluginMessage::toString(buffer+c);
+    c = c + sprintf(buffer+c,"}");
+    return c;
+  }
 };
 
 template <> struct EntityIds<MqttMessage> {

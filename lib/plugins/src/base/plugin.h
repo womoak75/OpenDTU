@@ -16,6 +16,7 @@
 class Plugin {
 public:
   Plugin(int _id, const char *_name);
+  Plugin(int _id, const char *_name, bool alwayActive);
   ~Plugin() {}
   int getId();
   const char *getName();
@@ -93,16 +94,6 @@ protected:
    * false otherwise
    */
   void subscribeMqtt(char *topic, bool append);
-  /**
-   * @brief enqueue mqtt message
-   *
-   * @param topic - mqtt topic
-   * @param data - data to be send
-   * @param append - true: {DEFAULT MQTT TOPIC}/{pluginname}/{topic}, false:
-   * {topic}
-   * @return true if message was queued successful - false otherwise
-   */
-  bool enqueueMessage(char *topic, char *data, bool append = true);
 
   /**
    * @brief add timer callback.

@@ -193,8 +193,7 @@ public:
     }
   }
   void internalCallback(std::shared_ptr<PluginMessage> message) {
-    MessageOutput.printf("inverterplugin internalCallback: %d\n",
-                         message->getSenderId());
+    // DBGPRINTMESSAGELNCB(DBG_INFO, getName(), message);
     if (message->isMessageType<PowerControlMessage>()) {
       PowerControlMessage *m = (PowerControlMessage *)message.get();
       handleMessage(m);
@@ -208,16 +207,14 @@ public:
     uint64_t serial = message->serial;
     inverterstruct *inverter = inverters.getInverterByLongSerial(serial);
     if (inverter != nullptr) {
-      MessageOutput.printf("InverterPlugin: PluginPowercontrol: found "
-                           "inverter with serial %llu\n",
+      MessageOutput.printf("InverterPlugin: found inverter with serial %llu\n",
                            serial);
       setInverterLimit(inverter, limit);
     } else {
       String sserial = message->serialString;
       inverterstruct *inverter = inverters.getInverterByStringSerial(sserial);
       if (inverter != nullptr) {
-        MessageOutput.printf("InverterPlugin: PluginPowercontrol: found "
-                             "inverter with serialString %s\n",
+        MessageOutput.printf("InverterPlugin: found inverter with serialString %s\n",
                              sserial.c_str());
         setInverterLimit(inverter, limit);
       }

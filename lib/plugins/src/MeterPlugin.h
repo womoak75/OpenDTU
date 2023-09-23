@@ -77,14 +77,13 @@ public:
     }
     ms->setPower(consumption);
   }
-  void mqttCallback(const MqttMessage *message) {
-    MessageOutput.printf("meterplugin: mqttCallback %s = %s\n", message->topic,
-                         (char *)message->payload);
+  void mqttCallback( MqttMessage *message) {
+    MessageOutput.printf("meterplugin: mqttCallback %s = %s\n", message->topic.get(), message->payloadToChar().get());
     char buffer[message->length + 1];
     buffer[message->length] = '\0';
-    mempcpy(buffer, message->payload, message->length);
-    if (topicMap.find(message->topic) != topicMap.end()) {
-      String serial = topicMap[message->topic];
+    mempcpy(buffer, message->payload.get(), message->length);
+    if (topicMap.find(message->topic.get()) != topicMap.end()) {
+      String serial = topicMap[message->topic.get()];
       float cons = atof(buffer);
       setMeterConsumption(serial, cons);
     } else {
@@ -160,13 +159,11 @@ public:
   }
   void internalCallback(std::shared_ptr<PluginMessage> message) {
 
-    MessageOutput.printf("meterplugin internalCallback: %d\n",
-                         message->getSenderId());
+    // DBGPRINTMESSAGELNCB(DBG_INFO, getName(), message);
     if (message->isMessageType<MqttMessage>()) {
-      const MqttMessage *m = (MqttMessage *)message.get();
+      MqttMessage *m = (MqttMessage *)message.get();
       mqttCallback(m);
-    }
-    
+    } 
   }
 
 private:

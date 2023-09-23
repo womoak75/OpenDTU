@@ -10,9 +10,11 @@ public:
   float power;
   String serialString;
   uint64_t serial;
-  void toString(char *buffer) {
-    sprintf(buffer, "PowerControlMessage{sender:%d, receiver:%d, type:%d}",
-            getSenderId(), getReceiverId(), type_id);
+  int toString(char *buffer) {
+    int c = sprintf(buffer, "PowerControlMessage{base=");
+    c = c + PluginMessage::toString(buffer+c);
+    c = c + sprintf(buffer+c,"}");
+    return c;
   }
 };
 template <> struct EntityIds<PowerControlMessage> {

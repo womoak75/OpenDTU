@@ -7,9 +7,11 @@ public:
   DemoMessage(Plugin &p) : PluginMessage(TYPEIDS::DEMOMESSAGE_TYPE, p) {}
   void setSomeValue(float f) { somevalue = f; }
   float getSomeValue() { return somevalue; }
-  void toString(char *buffer) {
-    sprintf(buffer, "DemoMessage{sender:%d, receiver:%d, type:%d}",
-            getSenderId(), getReceiverId(), type_id);
+  int toString(char *buffer) {
+    int c = sprintf(buffer, "DemoMessage{base=");
+    c = c + PluginMessage::toString(buffer+c);
+    c = c + sprintf(buffer+c,"}");
+    return c;
   }
 
 private:

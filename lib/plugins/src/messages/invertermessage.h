@@ -19,9 +19,11 @@ public:
    *value - value transmited by inverter
    */
   float value;
-  void toString(char *buffer) {
-    sprintf(buffer, "InverterMessage{sender:%d, receiver:%d, type:%d}",
-            getSenderId(), getReceiverId(), type_id);
+  int toString(char *buffer) {
+    int c = sprintf(buffer, "InverterMessage{base=");
+    c = c + PluginMessage::toString(buffer+c);
+    c = c + sprintf(buffer+c,"}");
+    return c;
   }
 };
 

@@ -7,6 +7,7 @@
  */
 
 Plugin::Plugin(int _id, const char *_name) : id(_id), name(_name) {}
+Plugin::Plugin(int _id, const char *_name, bool alwaysActive) : id(_id), name(_name), enabled(alwaysActive) {}
 int Plugin::getId() { return id; }
 const char *Plugin::getName() { return name; }
 bool Plugin::isEnabled() { return enabled; }
@@ -53,14 +54,6 @@ void Plugin::subscribeMqtt(char *topic, bool append) {
     system->subscribeMqtt(this, topic, append);
   }
 }
-
-bool Plugin::enqueueMessage(char *topic, char *data, bool append) {
-  if (system) {
-    return system->enqueueMessage(this, topic, data, append);
-  }
-  return false;
-}
-
 
 void Plugin::addTimerCb(PLUGIN_TIMER_INTVAL intvaltype, uint32_t interval,
                         std::function<void(void)> timerCb,

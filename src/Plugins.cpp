@@ -9,18 +9,22 @@
 #include "PluginConfiguration.h"
 #include "PowercontrolPlugin.h"
 #include "demoplugin.h"
+#include "PublishPlugin.h"
 
 PluginsClass Plugins;
 demoPlugin demoP = demoPlugin();
 MeterPlugin meterP = MeterPlugin();
 InverterPlugin inverterP = InverterPlugin();
 PowercontrolPlugin powercontrollerP = PowercontrolPlugin();
+PublishPlugin publishP = PublishPlugin();
 
 void PluginsClass::init() {
   addPlugin(&demoP);
   addPlugin(&meterP);
   addPlugin(&inverterP);
   addPlugin(&powercontrollerP);
+  publishP.mqttMessageCB(std::bind(&PluginsClass::mqttMessageCB, this, std::placeholders::_1));
+  addPlugin(&publishP);
   for (unsigned int i = 0; i < plugins.size(); i++) {
     plugins[i]->setSystem(this);
     PluginConfiguration.read(plugins[i]);
@@ -67,7 +71,6 @@ void PluginsClass::loop() {
       plugins[i]->loop();
     }
   }
-  publish();
 }
 
 void PluginsClass::start(Plugin *p) {
@@ -93,28 +96,6 @@ void PluginsClass::subscribeMqtt(Plugin *plugin, char *topic, bool append) {
       });
 }
 
-bool PluginsClass::enqueueMessage(Plugin *sender, char *topic, char *data,
-                                  bool append) {
-  // MessageOutput.printf("PluginsClass::enqueueMessage sender=%d\n",
-  // sender->getId());
-  size_t topiclen = strlen(topic) + 1;
-  size_t datalen = strlen(data) + 1;
-  if (bufferindex + topiclen + datalen > THIRDPARTY_MSG_BUFFERSIZE) {
-    return false;
-  }
-  qentry entry;
-  entry.topicindex = bufferindex;
-  memcpy(buffer + bufferindex, topic, topiclen);
-  bufferindex += topiclen;
-  entry.dataindex = bufferindex;
-  memcpy(buffer + bufferindex, data, datalen);
-  bufferindex += datalen;
-  entry.appendtopic = append;
-  entry.pluginid = sender->getId();
-  q.push(entry);
-  return true;
-}
-
 void PluginsClass::addTimerCb(Plugin *plugin, const char *timername,
                               PLUGIN_TIMER_INTVAL intval, uint32_t interval,
                               std::function<void(void)> timerCb) {
@@ -130,26 +111,27 @@ void PluginsClass::addTimerCb(Plugin *plugin, const char *timername,
   entry.timerCb = timerCb;
   timercbs.push_back(entry);
 }
-void PluginsClass::publish() {
-  // we dont care about real topic length, one size fit's all ;)
-  char topic[128];
-  while (!q.empty() && MqttSettings.getConnected()) {
-    qentry entry = q.front();
-    auto sender = getPluginById(entry.pluginid);
-    if (NULL != sender) {
-      snprintf(topic, sizeof(topic), "%s/%s", sender->getName(),
-               (const char *)buffer + entry.topicindex);
-      if (entry.appendtopic) {
-        MqttSettings.publish(topic, (const char *)buffer + entry.dataindex);
-      } else {
-        MqttSettings.publishGeneric(
-            topic, (const char *)buffer + entry.dataindex, false, 0);
-      }
-    }
-    q.pop();
-  }
 
-  bufferindex = 0;
+void PluginsClass::mqttMessageCB(MqttMessage* message) {
+  // we dont care about real topic length, one size fit's all ;)
+//   char topic[128];
+   if (!MqttSettings.getConnected()) {
+        MessageOutput.printf("PluginsClass: mqtt not connected. can not send message!");
+        return;
+   }
+    MessageOutput.printf("PluginsClass: publish mqtt nmessage!");
+    auto sender = getPluginById(message->getSenderId());
+    if (NULL != sender) {
+        char topic[128];
+      snprintf(topic, sizeof(topic), "%s/%s", sender->getName(),
+                (const char *)message->topic.get());
+      if (message->appendTopic) {
+            MqttSettings.publish(topic, (const char *)message->payloadToChar().get());
+       } else {
+         MqttSettings.publishGeneric(
+             topic, (const char *)message->payloadToChar().get(), false, 0);
+       }
+   }
 }
 
 Plugin *PluginsClass::getPluginByIndex(int pluginindex) {
@@ -208,8 +190,7 @@ void PluginsClass::publishInternal() {
   while (msgs.size()>0l) {
     auto message = msgs.front();
 
-    // MessageOutput.printf("plugins publishInternal
-    // sender=%d\n",message->getSenderId());
+    DBGPRINTMESSAGEFROMTO(DBG_INFO,"mainloop",message);
     if (message->getReceiverId() != 0) {
       publishToReceiver(message);
     } else {

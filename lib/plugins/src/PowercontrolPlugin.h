@@ -110,10 +110,13 @@ public:
     publishMessage(m);
     char topic[pc.inverterSerialString.length() + 7];
     char payload[32];
-    snprintf(payload, sizeof(payload), "%f", pc.limit);
+    int len = snprintf(payload, sizeof(payload), "%f", pc.limit);
     snprintf(topic, sizeof(payload), "%s/updateLimit",
              pc.inverterSerialString.c_str());
-    enqueueMessage(topic, payload, true);
+    MqttMessage mqtt(getId(),PluginIds::PluginPublish);
+    mqtt.setMqtt(topic,(const uint8_t*)payload,len);
+    mqtt.appendTopic = true;
+    publishMessage(mqtt);
   }
 
   void handleInverterMessage(InverterMessage *message) {
@@ -147,8 +150,7 @@ public:
   }
 
   void internalCallback(std::shared_ptr<PluginMessage> message) {
-    MessageOutput.printf("powercontrol internalCallback: %d\n",
-                         message->getSenderId());
+    // DBGPRINTMESSAGELNCB(DBG_INFO, getName(), message);
     if (message->isMessageType<InverterMessage>()) {
       InverterMessage *m = (InverterMessage *)message.get();
       handleInverterMessage(m);

@@ -13,11 +13,14 @@ public:
     MessageOutput.println("demoplugin:onTickerSetup()");
 
     addTimerCb(
-        SECOND, 3,
-        [this]() {
+        SECOND, 5,
+        [&]() {
           DemoMessage m(*this);
           m.setSomeValue(08.15f);
           publishMessage(m);
+          MqttMessage mqtt(getId(),PluginIds::PluginPublish);
+          mqtt.setMqtt("public/mqtt",(const uint8_t*)"{hello world}",13);
+          publishMessage(mqtt);
         },
         "demoplugintimer1");
     /*
@@ -46,11 +49,8 @@ public:
   void onMqttSubscribe() { subscribeMqtt((char *)"public/topic", false); }
 
   void mqttCallback(const MqttMessage *message) {
-    // receive data for
-    // ahoi topic: 'DEF_MQTT_TOPIC/devcontrol/#'
-    // thirdparty topic: 'DEF_MQTT_TOPIC/thirdparty/#'
-    // default for DEF_MQTT_TOPIC = "inverter" (see config.h)
-    MessageOutput.printf("demoplugin: mqttCallback %s \n", message->intopic.get());
+
+    MessageOutput.printf("demoplugin: mqttCallback %s \n", message->topic.get());
   }
 
   void internalCallback(std::shared_ptr<PluginMessage> message) {
