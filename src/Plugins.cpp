@@ -190,12 +190,13 @@ void PluginsClass::publishInternal() {
   while (msgs.size()>0l) {
     auto message = msgs.front();
 
-    DBGPRINTMESSAGEFROMTO(DBG_INFO,"mainloop",message);
+    DBGPRINTMESSAGEFROMTO(DBG_INFO,"mainloop start",message);
     if (message->getReceiverId() != 0) {
       publishToReceiver(message);
     } else {
       publishToAll(message);
     }
+    DBGPRINTMESSAGEDURATION(DBG_INFO,"mainloop end",message);
 
     msgs.pop();
     // do i need this? :/

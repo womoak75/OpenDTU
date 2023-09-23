@@ -9,10 +9,10 @@ def writeFile(outf,pluginlist,taglist):
     outfile.write("#pragma once\n\n");
     outfile.write("#ifndef NDEBUG\n")
     generateIds(outfile, pluginlist)
-    generateValueIds(outfile, pluginlist)
+    #generateValueIds(outfile, pluginlist)
     generateValueIdsString(outfile,pluginlist)
     outfile.flush();
-    generateTagIds(outfile, taglist)
+    #generateTagIds(outfile, taglist)
     #generateTagIdsString(outfile, taglist)
     outfile.write("#endif // NDEBUG\n")
     generateDebugFunction(outfile, pluginlist, taglist)
@@ -35,9 +35,9 @@ def generateValueIds(f,plist):
 def generateValueIdsString(f,plist):
     for p in plist:
         f.write("const char Plugin"+p['pname'].capitalize()+"IdString[] = \""+p['pname'].capitalize()+"\";\n")
-        for v in p['enumvalue']:
-            enumval = v.replace(" ","")
-            f.write("const char Plugin"+p['pname'].capitalize()+enumval+"IdString[] = \""+enumval+"\";\n")
+        # for v in p['enumvalue']:
+        #     enumval = v.replace(" ","")
+        #     f.write("const char Plugin"+p['pname'].capitalize()+enumval+"IdString[] = \""+enumval+"\";\n")
     f.write("const char PluginUnknown[] = \"unknown\";\n")
 
 def generateTagIds(f, taglist):
@@ -64,23 +64,23 @@ def generateDebugFunction(f,plist,tlist):
     f.write("#define DBGPRINTMESSAGEFROMTO(level,prefix,message)\n")
     f.write("#else\n")
     f.write("class PluginDebug {\npublic:\n")
-    generateTagIdsString(f, tlist)
+    #generateTagIdsString(f, tlist)
     f.write("static const char* getPluginNameDebug(int pid) {\n\tswitch(pid){\n")
     for p in plist:
         f.write("\t\tcase "+p['pid']+": return Plugin"+p['pname'].capitalize()+"IdString;\n")
     f.write("\t\tdefault: return PluginUnknown;\n")
     f.write("}\n}\n")
-    f.write("static const char* getPluginValueNameDebug(int pid, int vid) {\n\tswitch(pid){\n")
-    for p in plist:
-        f.write("\t\tcase "+p['pid']+": switch(vid){\t\t\t\n")
-        i = 0
-        for v in p['enumvalue']:
-            f.write("\t\t\t\tcase "+str(i)+": return Plugin"+p['pname'].capitalize()+v.replace(" ","")+"IdString;\n")
-            i+=1
-        f.write("\t\t\t\tdefault: return PluginUnknown;\n")
-        f.write("}\n")
-    f.write("\t\t\tdefault: return PluginUnknown;\n")
-    f.write("}\n}\n")
+    # f.write("static const char* getPluginValueNameDebug(int pid, int vid) {\n\tswitch(pid){\n")
+    # for p in plist:
+    #     f.write("\t\tcase "+p['pid']+": switch(vid){\t\t\t\n")
+    #     i = 0
+    #     for v in p['enumvalue']:
+    #         f.write("\t\t\t\tcase "+str(i)+": return Plugin"+p['pname'].capitalize()+v.replace(" ","")+"IdString;\n")
+    #         i+=1
+    #     f.write("\t\t\t\tdefault: return PluginUnknown;\n")
+    #     f.write("}\n")
+    # f.write("\t\t\tdefault: return PluginUnknown;\n")
+    # f.write("}\n}\n")
     f.write("}; /* PluginDebug class end */\n")
     f.write("#define DBGPRINTMESSAGELN(level,prefix,message) ({\\\n")
     f.write("       char msgbuffer[256];\\\n")
@@ -97,17 +97,31 @@ def generateDebugFunction(f,plist,tlist):
     f.write("       message->toString(msgbuffer);\\\n")
     f.write("       MessageOutput.printf(\"%s: From %s to %s -> %s\\n\",prefix,PluginDebug::getPluginNameDebug(message->getSenderId()),PluginDebug::getPluginNameDebug(message->getReceiverId()),msgbuffer);\\\n")
     f.write("  })\n")
+    f.write("#define DBGPRINTMESSAGEDURATION(level,prefix,message) ({\\\n")
+    f.write("       unsigned long duration = millis();\\\n")
+    f.write("       duration = duration - message->getTS();\\\n")
+    f.write("       MessageOutput.printf(\"%s: message processed in %lu [ms]\\n\",prefix,duration);\\\n")
+    f.write("  })\n")
     f.write("#endif\n")
         
 def parseFile(fin):
     f = open(fin, "r")
     data = f.read().replace('\n', '')
     #print(data)
+    pid = None;
+    name = None;
+    enumvals = None;
     x = re.search(r'(enum)\s+(\w+)\s+\{\s*([^\}]+)\s*\};(.*Plugin\s*\((\d*)\s*,\s*"([^"]*)")', data)
     if x:
-        return x.group(5), x.group(6), x.group(3)
+        pid = x.group(5)
+        name = x.group(6)
+        enumvals = x.group(3)
     else:
-        return None,None,None
+        x = re.search(r'(.*Plugin\s*\((\d*)\s*,\s*"([^"]*)")', data)
+        if x:
+            pid = x.group(2)
+            name = x.group(3)
+    return pid,name,enumvals
 
 def parseFileEnum(fin):
     f = open(fin, "r")
@@ -158,8 +172,11 @@ for f in files:
     pid, pname,enumvalue = parseFile(f)
     tags = parseFileEnum(f)
     if pid != None:
-        print(pid+":"+pname+":"+enumvalue)
-        vids = enumvalue.split(",")
+        print(pid+":"+pname+":"+str(enumvalue))
+        if enumvalue != None:
+            vids = enumvalue.split(",")
+        else:
+            vids = []
         pluginlist.append({'pid':pid,'pname':pname,'enumvalue':list(vids)})
     if tags != None:
         print(tags)

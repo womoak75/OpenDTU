@@ -46,6 +46,7 @@ class PluginMessage : public Entity {
     int getSenderId() { return senderId; }
     int getReceiverId() { return receiverId; }
     void setReceiverId(int id) { receiverId = id; }
+    unsigned long getTS() { return ts; }
     virtual int toString(char* buffer);
     template <typename U>
     bool isMessageType()
@@ -65,6 +66,6 @@ class PluginMessage : public Entity {
     protected:
     int senderId = 0;
     int receiverId = 0;
-    long ts = millis();
+    unsigned long ts = millis();
  };
 

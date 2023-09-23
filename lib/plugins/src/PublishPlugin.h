@@ -5,7 +5,6 @@
 #include <functional>
 
 class PublishPlugin : public Plugin {
-enum pluginIds { PUBLISHERDUMMY };
 
 public:
   PublishPlugin() : Plugin(100, "publish", true) {}
