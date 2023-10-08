@@ -87,6 +87,12 @@ public:
         break;
       }
     }
+    if (inv == nullptr) {
+      PDebug.printf(PDebugLevel::WARN,
+                    "hoymilesplugin: inverter(%s) not found!\n",
+                    inverterId.c_str());
+      return;
+    }
     if (!allow_limitation) {
       PDebug.printf(PDebugLevel::INFO,
                     "hoymilesplugin: inverter[%s] set powerlimit not allowed\n",
@@ -99,36 +105,32 @@ public:
                     "hoymilesplugin: inverter[%s] minimum limit is %f W\n",
                     inv->serialString().c_str(), limit_minimum_w);
     }
-    if (inv != nullptr) {
-      PDebug.printf(
-          PDebugLevel::INFO,
-          "hoymilesplugin: sendActivePowerControlRequest %f W to %s\n", limit,
-          inv->serialString().c_str());
-    } else {
+    if (requestPending(inv->serialString())) {
+      // limit request already pending
       PDebug.printf(PDebugLevel::WARN,
-                    "hoymilesplugin: inverter(%s) not found!\n",
-                    inverterId.c_str());
+                    "hoymilesplugin: inverter[%s] power control request "
+                    "pending. omit new limit request\n",
+                    inv->serialString().c_str());
+      return;
     }
-    if (inv != nullptr) {
-      inv->sendActivePowerControlRequest(
-          limit, PowerLimitControlType::AbsolutNonPersistent);
-      if (inv->SystemConfigPara()->getLastLimitCommandSuccess() !=
-          CMD_PENDING) {
-        PDebug.printf(PDebugLevel::DEBUG,
-                      "hoymilesplugin: sendActivePowerControlRequest %f "
-                      "W to %s -> FAILED!\n",
-                      limit, inv->serialString().c_str());
-      } else {
-        watch(inv.get(), limit);
-        PDebug.printf(PDebugLevel::DEBUG,
-                      "hoymilesplugin: sendActivePowerControlRequest %f W to "
-                      "%s -> PENDING\n",
-                      limit, inv->serialString().c_str());
-      }
+
+    inv->sendActivePowerControlRequest(
+        limit, PowerLimitControlType::AbsolutNonPersistent);
+    if (inv->SystemConfigPara()->getLastLimitCommandSuccess() != CMD_PENDING) {
+      PDebug.printf(PDebugLevel::DEBUG,
+                    "hoymilesplugin: sendActivePowerControlRequest %f "
+                    "W to %s -> FAILED!\n",
+                    limit, inv->serialString().c_str());
+    } else {
+      watch(inv.get(), limit);
+      PDebug.printf(PDebugLevel::DEBUG,
+                    "hoymilesplugin: sendActivePowerControlRequest %f W to "
+                    "%s -> PENDING\n",
+                    limit, inv->serialString().c_str());
     }
   }
 
-  bool requestPending(String &inverterId) {
+  bool requestPending(const String &inverterId) {
     return hasTimerCb(inverterId.c_str());
   }
 
@@ -136,7 +138,11 @@ public:
     addTimerCb(
         SECOND, 2,
         [this, inv, limit]() {
-          if (inv->SystemConfigPara()->getLastLimitCommandSuccess() == CMD_OK) {
+          if (inv->SystemConfigPara()->getLastLimitCommandSuccess() ==
+              CMD_NOK) {
+            removeTimerCb(inv->serialString().c_str());
+          } else if (inv->SystemConfigPara()->getLastLimitCommandSuccess() ==
+                     CMD_OK) {
             PDebug.printf(PDebugLevel::DEBUG,
                           "hoymilesplugin: Hoymiles(%s) limit %f W -> OK!\n",
                           inv->serialString().c_str(), limit);
