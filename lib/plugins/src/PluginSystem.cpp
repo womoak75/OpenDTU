@@ -16,6 +16,8 @@
 #endif
 
 #include "PluginSystem.hpp"
+#include "base/pluginmessagequeuepublisher.h"
+#include "base/pluginmessagequeuepublisher.cpp"
 
 PluginSystem::PluginSystem(SystemConfigurator<Plugin>& _configurator)
     : System<Plugin>(), publisher(PluginMultiQueueMessagePublisher(plugins)), configurator(_configurator) {}

@@ -93,7 +93,6 @@ void PluginSingleQueueMessagePublisher::loop() {
                   "----\n%s\nduration: %lu [ms]\n----\nmainloop end\n", buffer,
                   duration);
 
-    queue.pop();
     // do i need this? :/
     message.reset();
   }

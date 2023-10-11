@@ -14,8 +14,7 @@
 #include "customplugin.h"
 #endif
 #include "base/pluginmessagepublisher.h"
-#include "base/pluginmessagequeuepublisher.h"
-#include "base/pluginmessagequeuepublisher.cpp"
+
 
 
 class PluginSystem : public System<Plugin> {

@@ -4,30 +4,8 @@
 #include "base/pluginmessages.h"
 #include <map>
 
-class PluginMessageQueue : public ThreadSafeContainerQueue<
-                               std::queue<std::shared_ptr<PluginMessage>>,
-                               std::shared_ptr<PluginMessage>> {
-protected:
-  std::shared_ptr<PluginMessage> getElement() { return container.front(); }
-};
 
-class PriorityMessageQueueCompare {
-public:
-  bool operator()(std::shared_ptr<PluginMessage> &m1,
-                  std::shared_ptr<PluginMessage> m2) {
-    return (m1.get()->getPriority() < m2.get()->getPriority());
-  }
-};
-
-class PluginPriorityMessageQueue
-    : public ThreadSafeContainerQueue<
-          std::priority_queue<std::shared_ptr<PluginMessage>,
-                              std::vector<std::shared_ptr<PluginMessage>>,
-                              PriorityMessageQueueCompare>,
-          std::shared_ptr<PluginMessage>> {
-protected:
-  std::shared_ptr<PluginMessage> getElement() { return container.top(); }
-};
+//std::priority_queue<std::shared_ptr<PluginMessage>,  std::vector<std::shared_ptr<PluginMessage>>,PriorityMessageQueueCompare>;
 
 class PluginMessagePublisher {
 public:
@@ -70,5 +48,5 @@ protected:
   virtual void publishToAll(const std::shared_ptr<PluginMessage> &message);
 
 private:
-  PluginMessageQueue queue;
+  ThreadSafeMessageQueue queue;
 };
