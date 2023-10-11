@@ -42,7 +42,23 @@ protected:
 
 class PluginMock : public Plugin {
 public:
-  PluginMock() : Plugin(9999999, "pluginmock") { TEST_MESSAGE("PluginMock()"); }
+  static const int PLUGINID = 9999999;
+  PluginMock() : Plugin(PLUGINID, "pluginmock") {
+    TEST_MESSAGE("PluginMock()");
+  }
+  PluginMock(int id) : Plugin(id, "pluginmockid") {
+    TEST_MESSAGE("PluginMock()");
+  }
+
+  void setup() { TEST_MESSAGE("PluginMock.setup()"); }
+
+  void loop() { TEST_MESSAGE("PluginMock.loop()"); }
+
+  void internalCallback(const std::shared_ptr<PluginMessage> mes) {
+    PowerMessage *m = (PowerMessage *)mes.get();
+    TEST_PRINTF("pluginmessage %s: value: %f , priority %d!\n",
+                m->getMessageTypeString(), m->value, m->getPriority());
+  }
 };
 
 class ConfiguratorMock : public SystemConfigurator<Plugin> {
@@ -61,7 +77,8 @@ public:
 
 class SystemMock : public System<Plugin> {
 public:
-  SystemMock() : System<Plugin>(), publisher(plugins) {}
+  SystemMock()
+      : System<Plugin>(), publisher(plugins), systemPluginMock(90003) {}
   ~SystemMock() {}
   void setConfigurator(SystemConfigurator<Plugin> &configurator) {}
   void readPluginConfig(Plugin *p, JsonObject &config) {
@@ -85,15 +102,21 @@ public:
     return p;
   }
 
-  Plugin *getMockPlugin() { return &pluginMock; }
+  template <typename T> T createPluginT(T plugin, JsonObject &config) {
+    T p;
+    initPlugin(&p, config);
+    return p;
+  }
+
+  Plugin *getMockPlugin() { return &systemPluginMock; }
   std::shared_ptr<PowerMessage> createPowerMessage(float f) {
-    PowerMessage m(pluginMock);
+    PowerMessage m(systemPluginMock);
     m.deviceId = "inverterSerial";
     m.value = f;
     return std::make_shared<PowerMessage>(m);
   }
   std::shared_ptr<MeterMessage> createMeterMessage(float f) {
-    MeterMessage m(pluginMock);
+    MeterMessage m(systemPluginMock);
     m.serial = "meterSerial";
     m.power = f;
     return std::make_shared<MeterMessage>(m);
@@ -117,7 +140,7 @@ public:
   Plugin *getPluginByName(const char *pluginname) { return NULL; }
   int getPluginCount() { return 0; }
   PublisherMock publisher;
-  PluginMock pluginMock;
+  PluginMock systemPluginMock;
 
 private:
   std::vector<std::unique_ptr<Plugin>> plugins;

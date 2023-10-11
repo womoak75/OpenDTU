@@ -8,88 +8,81 @@
 
 #include "PowercontrolPlugin.h"
 
-void setUp(void) {}
+class PowerControlTests {
+public:
+  static void test_PowercontrolLimit(void) {
+    TEST_MESSAGE("test_PowercontrolLimit");
+    SystemMock testSystem;
+    auto pmptr = testSystem.createPowerMessage(800);
+    auto mmptr = testSystem.createMeterMessage(400);
 
-void tearDown(void) {
-  // clean stuff up here
-}
+    DynamicJsonDocument doc(1024);
+    JsonObject config = doc.createNestedObject("config");
+    config["enabled"] = true;
+    config["meter_serial"] = mmptr->serial;
+    config["inverter_serial"] = pmptr->deviceId;
 
-SystemMock testSystem;
+    auto powerControl = testSystem.createPlugin<PowercontrolPlugin>(
+        PowercontrolPlugin(), config);
 
-void test_PowercontrolLimit(void) {
-  TEST_MESSAGE("test_PowercontrolLimit");
+    LimitControlMessage *lmc = nullptr;
+    testSystem.cb = [&lmc](const std::shared_ptr<PluginMessage> m) {
+      if (m.get()->isMessageType<LimitControlMessage>())
+        lmc = (LimitControlMessage *)m.get();
+    };
 
-  auto pmptr = testSystem.createPowerMessage(800);
-  auto mmptr = testSystem.createMeterMessage(400);
+    powerControl->internalCallback(pmptr);
+    powerControl->internalCallback(mmptr);
+    powerControl->loop();
 
-  DynamicJsonDocument doc(1024);
-  JsonObject config = doc.createNestedObject("config");
-  config["enabled"] = true;
-  config["meter_serial"] = mmptr->serial;
-  config["inverter_serial"] = pmptr->deviceId;
+    TEST_ASSERT_NOT_NULL(lmc);
+  }
+  static void test_PowercontrolLimitUnknownSender(void) {
+    TEST_MESSAGE("test_PowercontrolLimitUnknownSender");
+    SystemMock testSystem;
+    auto pmptr = testSystem.createPowerMessage(800);
+    auto mmptr = testSystem.createMeterMessage(400);
 
-  auto powerControl =
-      testSystem.createPlugin<PowercontrolPlugin>(PowercontrolPlugin(), config);
+    DynamicJsonDocument doc(1024);
+    JsonObject config = doc.createNestedObject("config");
+    config["enabled"] = true;
+    config["meter_serial"] = mmptr->serial;
+    config["inverter_serial"] = pmptr->deviceId;
 
-  LimitControlMessage *lmc = nullptr;
-  testSystem.cb = [&lmc](const std::shared_ptr<PluginMessage> m) {
-    if (m.get()->isMessageType<LimitControlMessage>())
-      lmc = (LimitControlMessage *)m.get();
-  };
+    auto powerControl = testSystem.createPlugin<PowercontrolPlugin>(
+        PowercontrolPlugin(), config);
 
-  powerControl->internalCallback(pmptr);
-  powerControl->internalCallback(mmptr);
-  powerControl->loop();
+    LimitControlMessage *lmc = nullptr;
+    testSystem.cb = [&lmc](const std::shared_ptr<PluginMessage> m) {
+      if (m.get()->isMessageType<LimitControlMessage>())
+        lmc = (LimitControlMessage *)m.get();
+    };
+    mmptr->serial = "unknown";
+    powerControl->internalCallback(pmptr);
+    powerControl->internalCallback(mmptr);
+    powerControl->loop();
 
-  TEST_ASSERT_NOT_NULL(lmc);
-}
-void test_PowercontrolLimitUnknownSender(void) {
-  TEST_MESSAGE("test_PowercontrolLimitUnknownSender");
+    TEST_ASSERT_NULL(lmc);
+  }
 
-  auto pmptr = testSystem.createPowerMessage(800);
-  auto mmptr = testSystem.createMeterMessage(400);
+  static void test_function_should_doAlsoDoBlah(void) {
+    // more test stuff
+  }
+};
 
-  DynamicJsonDocument doc(1024);
-  JsonObject config = doc.createNestedObject("config");
-  config["enabled"] = true;
-  config["meter_serial"] = mmptr->serial;
-  config["inverter_serial"] = pmptr->deviceId;
-
-  auto powerControl =
-      testSystem.createPlugin<PowercontrolPlugin>(PowercontrolPlugin(), config);
-
-  LimitControlMessage *lmc = nullptr;
-  testSystem.cb = [&lmc](const std::shared_ptr<PluginMessage> m) {
-    if (m.get()->isMessageType<LimitControlMessage>())
-      lmc = (LimitControlMessage *)m.get();
-  };
-  mmptr->serial = "unknown";
-  powerControl->internalCallback(pmptr);
-  powerControl->internalCallback(mmptr);
-  powerControl->loop();
-
-  TEST_ASSERT_NULL(lmc);
-}
-
-void test_function_should_doAlsoDoBlah(void) {
-  // more test stuff
-}
-
-int runUnityTests(void) {
+int runUnityPowercontrolTests(void) {
   UNITY_BEGIN();
-  RUN_TEST(test_PowercontrolLimit);
-  RUN_TEST(test_PowercontrolLimitUnknownSender);
+  RUN_TEST(PowerControlTests::test_PowercontrolLimit);
+  RUN_TEST(PowerControlTests::test_PowercontrolLimitUnknownSender);
   return UNITY_END();
 }
-
-/**
- * For Arduino framework
- */
+/*
 void setup() {
   // Wait ~2 seconds before the Unity test runner
   // establishes connection with a board Serial interface
   delay(2000);
 
-  runUnityTests();
+  runUnityPowercontrolTests();
 }
 void loop() {}
+*/

@@ -57,12 +57,14 @@ public:
     auto v = std::static_pointer_cast<U>(this);
     return *v.get();
   }
+  int getPriority() { return priority; }
   virtual const char *getMessageTypeString() { return "PluginMessage"; }
+  void setPriority(int p) { priority = p; }
 
 protected:
   void setSenderId(int id) { senderId = id; }
 
-protected:
+  int priority = 0;
   int senderId = 0;
   int receiverId = 0;
   unsigned long ts;

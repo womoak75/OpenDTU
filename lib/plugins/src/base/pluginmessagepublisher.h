@@ -1,8 +1,33 @@
 #pragma once
 
+#include "base/ThreadSafePluginMessageQueue.h"
 #include "base/pluginmessages.h"
-#include <ThreadSafeQueue.h>
 #include <map>
+
+class PluginMessageQueue : public ThreadSafeContainerQueue<
+                               std::queue<std::shared_ptr<PluginMessage>>,
+                               std::shared_ptr<PluginMessage>> {
+protected:
+  std::shared_ptr<PluginMessage> getElement() { return container.front(); }
+};
+
+class PriorityMessageQueueCompare {
+public:
+  bool operator()(std::shared_ptr<PluginMessage> &m1,
+                  std::shared_ptr<PluginMessage> m2) {
+    return (m1.get()->getPriority() < m2.get()->getPriority());
+  }
+};
+
+class PluginPriorityMessageQueue
+    : public ThreadSafeContainerQueue<
+          std::priority_queue<std::shared_ptr<PluginMessage>,
+                              std::vector<std::shared_ptr<PluginMessage>>,
+                              PriorityMessageQueueCompare>,
+          std::shared_ptr<PluginMessage>> {
+protected:
+  std::shared_ptr<PluginMessage> getElement() { return container.top(); }
+};
 
 class PluginMessagePublisher {
 public:
@@ -11,7 +36,7 @@ public:
 
   void publish(const std::shared_ptr<PluginMessage> &message);
 
-  virtual void loop(){}
+  virtual void loop() {}
 
 protected:
   Plugin *getPluginById(int pluginid);
@@ -19,7 +44,8 @@ protected:
 
   int getPluginCount() { return plugins.size(); }
 
-  virtual void publishTo(int pluginId,const std::shared_ptr<PluginMessage> &mes);
+  virtual void publishTo(int pluginId,
+                         const std::shared_ptr<PluginMessage> &mes);
 
   virtual void publishToReceiver(const std::shared_ptr<PluginMessage> &mes);
 
@@ -37,28 +63,12 @@ public:
   void loop();
 
 protected:
-  virtual void publishTo(int pluginId,const std::shared_ptr<PluginMessage> &mes);
+  virtual void publishTo(int pluginId,
+                         const std::shared_ptr<PluginMessage> &mes);
   virtual void publishToReceiver(const std::shared_ptr<PluginMessage> &mes);
 
   virtual void publishToAll(const std::shared_ptr<PluginMessage> &message);
 
 private:
-  ThreadSafeQueue<std::shared_ptr<PluginMessage>> queue;
-};
-
-class PluginMultiQueueMessagePublisher : public PluginMessagePublisher {
-public:
-  PluginMultiQueueMessagePublisher(std::vector<std::unique_ptr<Plugin>> &p, bool subscriptionForced_=true);
-  virtual ~PluginMultiQueueMessagePublisher() {}
-
-  void loop();
-
-protected:
-  virtual void publishToReceiver(const std::shared_ptr<PluginMessage> &mes);
-  virtual void publishToAll(const std::shared_ptr<PluginMessage> &message);
-  virtual void publishTo(int pluginId,const std::shared_ptr<PluginMessage> &message);
-    
-private:
-  bool subscriptionForced;
-  std::map<int,std::shared_ptr<ThreadSafeQueue<std::shared_ptr<PluginMessage>>>> queues;
+  PluginMessageQueue queue;
 };

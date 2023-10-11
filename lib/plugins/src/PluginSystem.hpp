@@ -13,8 +13,10 @@
 #if __has_include("customplugin.h")
 #include "customplugin.h"
 #endif
+#include "base/pluginmessagepublisher.h"
+#include "base/pluginmessagequeuepublisher.h"
+#include "base/pluginmessagequeuepublisher.cpp"
 
-#include "PluginSystem.hpp"
 
 class PluginSystem : public System<Plugin> {
 public:
@@ -72,6 +74,6 @@ private:
   } timerentry;
   std::list<timerentry> timercbs;
   std::list<timerentry> timercbsnew;
-  PluginMultiQueueMessagePublisher publisher;
+  PluginMessagePublisher publisher;
   SystemConfigurator<Plugin>& configurator;
 };

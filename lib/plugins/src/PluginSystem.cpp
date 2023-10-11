@@ -18,7 +18,7 @@
 #include "PluginSystem.hpp"
 
 PluginSystem::PluginSystem(SystemConfigurator<Plugin>& _configurator)
-    : System<Plugin>(), publisher(plugins), configurator(_configurator) {}
+    : System<Plugin>(), publisher(PluginMultiQueueMessagePublisher(plugins)), configurator(_configurator) {}
 void PluginSystem::setMqttSubscribeCb(
     std::function<void(int id, const char *topic, bool append)> subscribeCB) {
   mqttSubscribeCB = subscribeCB;
