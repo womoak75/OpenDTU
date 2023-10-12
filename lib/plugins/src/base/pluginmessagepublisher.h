@@ -18,15 +18,14 @@ public:
   void publishTo(int pluginId, const std::shared_ptr<PluginMessage> &mes);
 
   void publishToReceiver(const std::shared_ptr<PluginMessage> &mes);
+  virtual bool isReceiver(int pluginId,
+                          const std::shared_ptr<PluginMessage> &mes);
 
 protected:
   inline bool isEnabled(int pluginId);
   Plugin *getPluginById(int pluginid);
   Plugin *getPluginByIndex(int index);
   inline int getPluginCount() { return plugins.size(); }
-
-  virtual bool isReceiver(int pluginId,
-                          const std::shared_ptr<PluginMessage> &mes);
 
   virtual void process(const std::shared_ptr<PluginMessage> &mes) {
     publishToReceiver(mes);
@@ -57,11 +56,11 @@ public:
   virtual ~PluginMultiQueueMessagePublisher() {}
 
   void loop();
+  virtual bool isReceiver(int pluginId,
+                          const std::shared_ptr<PluginMessage> &mes);
 
 protected:
   virtual void process(const std::shared_ptr<PluginMessage> &mes);
-  virtual bool isReceiver(int pluginId,
-                          const std::shared_ptr<PluginMessage> &mes);
 
 private:
   bool subscriptionForced;
@@ -75,11 +74,11 @@ public:
   virtual ~PluginMultiQueuePriorityMessagePublisher() {}
 
   void loop();
+  virtual bool isReceiver(int pluginId,
+                          const std::shared_ptr<PluginMessage> &mes);
 
 protected:
   virtual void process(const std::shared_ptr<PluginMessage> &mes);
-  virtual bool isReceiver(int pluginId,
-                          const std::shared_ptr<PluginMessage> &mes);
 
 private:
   bool subscriptionForced;

@@ -23,7 +23,9 @@ public:
       : PluginMessagePublisher(p), cb(nullptr) {}
   ~PublisherMock() {}
   std::function<void(const std::shared_ptr<PluginMessage> p)> cb;
-
+  bool isReceiver(int pluginId, std::shared_ptr<PluginMessage> &mes) {
+    return PluginMessagePublisher::isReceiver(pluginId,mes);
+  }
 protected:
   void process(const std::shared_ptr<PluginMessage> &mes) {
     TEST_MESSAGE("process");
@@ -43,6 +45,9 @@ public:
   PluginMock(int id) : Plugin(id, "pluginmockid") {
     TEST_MESSAGE("PluginMock()");
   }
+
+  template <typename T>
+  void subscribeMessage() { subscribe<T>(); }
 
   void setup() { TEST_MESSAGE("PluginMock.setup()"); }
 

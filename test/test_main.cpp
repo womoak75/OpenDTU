@@ -20,6 +20,7 @@ void setup() {
   RUN_TEST(PowerControlTests::test_PowercontrolLimitUnknownSender);
   RUN_TEST(QueueTest::test_priorityqueue);
   RUN_TEST(QueueTest::test_multiqueue);
+  RUN_TEST(QueueTest::test_publishisreceiver);
   UNITY_END();
 }
 void loop() {}

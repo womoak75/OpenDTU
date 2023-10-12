@@ -24,7 +24,7 @@ public:
     auto p = PluginMock();
     p.loadPluginSettings(config);
     p.setup();
-        p.cb = [](const std::shared_ptr<PluginMessage> m) {
+    p.cb = [](const std::shared_ptr<PluginMessage> m) {
       static int count = 0;
       PowerMessage *pm = (PowerMessage *)m.get();
       if (count == 0)
@@ -98,6 +98,29 @@ public:
     publisher.publish(pmptr);
     publisher.loop();
   }
+
+  static void test_publishisreceiver(void) {
+
+    SystemMock testSystem;
+    DynamicJsonDocument doc(1024);
+    JsonObject config = doc.createNestedObject("config");
+    config["enabled"] = true;
+
+    std::vector<std::unique_ptr<Plugin>> plugins;
+    auto p = PluginMock();
+    p.loadPluginSettings(config);
+    p.setup();
+    plugins.push_back(std::make_unique<PluginMock>(p));
+    auto message = testSystem.createMeterMessage(23);
+    PluginMessagePublisher publisher(plugins);
+    TEST_ASSERT_TRUE(publisher.isReceiver(p.getId(), message));
+    PluginMultiQueueMessagePublisher nonsubscriberpublisher(plugins, false);
+    TEST_ASSERT_TRUE(nonsubscriberpublisher.isReceiver(p.getId(), message));
+    PluginMultiQueueMessagePublisher subscriberpublisher(plugins, true);
+    TEST_ASSERT_FALSE(subscriberpublisher.isReceiver(p.getId(), message));
+    ((PluginMock *)plugins[0].get())->subscribeMessage<MeterMessage>();
+    TEST_ASSERT_TRUE(subscriberpublisher.isReceiver(p.getId(), message));
+  }
 };
 
 int runQueueUnityTests(void) {
@@ -106,4 +129,3 @@ int runQueueUnityTests(void) {
   RUN_TEST(QueueTest::test_multiqueue);
   return UNITY_END();
 }
-
