@@ -65,7 +65,6 @@ Each message will be inserted into a message queue, which will be processed by '
 #### multi queue message exchange
 
 Each message receiver get it's own queue.
-A priority-based (by message or receiver) delivery could be implemented easily.
 
 ![multiqueue](docs/pp/multiqueue.svg)
 
@@ -80,8 +79,14 @@ or
 ### subscription
   Each plugin (receiver) has to add a subscription for message types it wants to receive.
   
-___Default: multi queue subscription message___
 
+#### message priority
+ 
+Messages are inserted into the queue by priority.  
+Highest priority at queue top, lowest priority at queue end.
+
+
+___Default: multi queue subscription message (no priority)___
 
 ## how to add a custom plugin
 
