@@ -4,8 +4,8 @@
 #include "base/pluginmessages.h"
 #include <map>
 
-
-//std::priority_queue<std::shared_ptr<PluginMessage>,  std::vector<std::shared_ptr<PluginMessage>>,PriorityMessageQueueCompare>;
+// std::priority_queue<std::shared_ptr<PluginMessage>,
+// std::vector<std::shared_ptr<PluginMessage>>,PriorityMessageQueueCompare>;
 
 class PluginMessagePublisher {
 public:
@@ -15,19 +15,22 @@ public:
   void publish(const std::shared_ptr<PluginMessage> &message);
 
   virtual void loop() {}
+  void publishTo(int pluginId, const std::shared_ptr<PluginMessage> &mes);
+
+  void publishToReceiver(const std::shared_ptr<PluginMessage> &mes);
 
 protected:
+  inline bool isEnabled(int pluginId);
   Plugin *getPluginById(int pluginid);
   Plugin *getPluginByIndex(int index);
+  inline int getPluginCount() { return plugins.size(); }
 
-  int getPluginCount() { return plugins.size(); }
+  virtual bool isReceiver(int pluginId,
+                          const std::shared_ptr<PluginMessage> &mes);
 
-  virtual void publishTo(int pluginId,
-                         const std::shared_ptr<PluginMessage> &mes);
-
-  virtual void publishToReceiver(const std::shared_ptr<PluginMessage> &mes);
-
-  virtual void publishToAll(const std::shared_ptr<PluginMessage> &message);
+  virtual void process(const std::shared_ptr<PluginMessage> &mes) {
+    publishToReceiver(mes);
+  }
 
 private:
   std::vector<std::unique_ptr<Plugin>> &plugins;
@@ -41,12 +44,44 @@ public:
   void loop();
 
 protected:
-  virtual void publishTo(int pluginId,
-                         const std::shared_ptr<PluginMessage> &mes);
-  virtual void publishToReceiver(const std::shared_ptr<PluginMessage> &mes);
-
-  virtual void publishToAll(const std::shared_ptr<PluginMessage> &message);
+  virtual void process(const std::shared_ptr<PluginMessage> &message);
 
 private:
   ThreadSafeMessageQueue queue;
+};
+
+class PluginMultiQueueMessagePublisher : public PluginMessagePublisher {
+public:
+  PluginMultiQueueMessagePublisher(std::vector<std::unique_ptr<Plugin>> &p,
+                                   bool subscriptionForced_ = true);
+  virtual ~PluginMultiQueueMessagePublisher() {}
+
+  void loop();
+
+protected:
+  virtual void process(const std::shared_ptr<PluginMessage> &mes);
+  virtual bool isReceiver(int pluginId,
+                          const std::shared_ptr<PluginMessage> &mes);
+
+private:
+  bool subscriptionForced;
+  std::map<int, std::shared_ptr<ThreadSafeMessageQueue>> queues;
+};
+
+class PluginMultiQueuePriorityMessagePublisher : public PluginMessagePublisher {
+public:
+  PluginMultiQueuePriorityMessagePublisher(
+      std::vector<std::unique_ptr<Plugin>> &p, bool subscriptionForced_ = true);
+  virtual ~PluginMultiQueuePriorityMessagePublisher() {}
+
+  void loop();
+
+protected:
+  virtual void process(const std::shared_ptr<PluginMessage> &mes);
+  virtual bool isReceiver(int pluginId,
+                          const std::shared_ptr<PluginMessage> &mes);
+
+private:
+  bool subscriptionForced;
+  std::map<int, std::shared_ptr<ThreadSafePriorityMessageQueue>> queues;
 };

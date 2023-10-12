@@ -1,3 +1,4 @@
+#pragma once
 
 #include "base/plugin.h"
 #include "base/pluginmessagepublisher.h"
@@ -24,25 +25,18 @@ public:
   std::function<void(const std::shared_ptr<PluginMessage> p)> cb;
 
 protected:
-  void publishTo(int pluginId, const std::shared_ptr<PluginMessage> &mes) {
-    TEST_MESSAGE("publishTo");
-  }
-  void publishToReceiver(const std::shared_ptr<PluginMessage> &mes) {
-    TEST_MESSAGE("publishToReceiver");
+  void process(const std::shared_ptr<PluginMessage> &mes) {
+    TEST_MESSAGE("process");
     if (cb != nullptr)
       cb(mes);
-  }
-
-  void publishToAll(const std::shared_ptr<PluginMessage> &message) {
-    TEST_MESSAGE("publishToAll");
-    if (cb != nullptr)
-      cb(message);
   }
 };
 
 class PluginMock : public Plugin {
 public:
   static const int PLUGINID = 9999999;
+  std::function<void(const std::shared_ptr<PluginMessage> p)> cb = nullptr;
+
   PluginMock() : Plugin(PLUGINID, "pluginmock") {
     TEST_MESSAGE("PluginMock()");
   }
@@ -58,6 +52,8 @@ public:
     PowerMessage *m = (PowerMessage *)mes.get();
     TEST_PRINTF("pluginmessage %s: value: %f , priority %d!\n",
                 m->getMessageTypeString(), m->value, m->getPriority());
+    if (cb)
+      cb(mes);
   }
 };
 

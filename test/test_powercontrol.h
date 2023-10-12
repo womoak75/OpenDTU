@@ -76,13 +76,4 @@ int runUnityPowercontrolTests(void) {
   RUN_TEST(PowerControlTests::test_PowercontrolLimitUnknownSender);
   return UNITY_END();
 }
-/*
-void setup() {
-  // Wait ~2 seconds before the Unity test runner
-  // establishes connection with a board Serial interface
-  delay(2000);
 
-  runUnityPowercontrolTests();
-}
-void loop() {}
-*/
