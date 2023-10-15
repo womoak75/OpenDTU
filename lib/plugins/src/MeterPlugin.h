@@ -1,5 +1,6 @@
 #pragma once
 
+#include "base/pluginstructs.h"
 #include "base/plugin.h"
 #include "messages/metermessage.h"
 #include "messages/mqttmessage.h"
@@ -53,52 +54,26 @@ public:
 
   void setup() {}
   void loop() {
-    for (int i = 0; i < meters.size(); i++) {
-      if (meters[i].isUpdated()) {
-        meters[i].clearUpdated();
-        publishAC(meters[i]);
+    for (int i = 0; i < meters.devices.size(); i++) {
+      if (meters.devices[i]->isUpdated()) {
+        meters.devices[i]->clearUpdated();
+        publishAC(meters.devices[i].get());
       }
     }
   }
 
-  bool meterExists(String &serial) {
-    Meter *ms = meters.getMeterBySerial(serial);
-    if (ms != nullptr) {
-      return true;
-    }
-    return false;
-  }
-
-  Meter *meterCreate(String &serial) {
-    Meter *ms = meters.getEmptyIndex();
-    if (ms != nullptr) {
-      ms->setSerial(serial);
-    }
-    return ms;
-  }
-
-  Meter *getIndex(String &serial) {
-    Meter *ms = meters.getMeterBySerial(serial);
-    if (ms == nullptr) {
-      ms = meters.getEmptyIndex();
-      if (ms != nullptr) {
-        ms->setSerial(serial);
-      }
-    }
-    return ms;
-  }
   void setMeterConsumption(String &serial, float consumption, Unit unit) {
     PDebug.printf(PDebugLevel::DEBUG,
                   "meterplugin: setMeterConsumption(%s,%f)\n", serial.c_str(),
                   consumption);
-    Meter *ms = nullptr;
-    if (!meterExists(serial)) {
-      ms = meterCreate(serial);
-      if (ms != nullptr)
-        ms->setUnit(unit);
+
+    if (!meters.hasDevice(serial)) {
+      MeterStruct m(serial);
+      m.setUnit(unit);
+      meters.addDevice(m);
     }
-    ms = getIndex(serial);
-    if (ms == nullptr) {
+    auto ms = meters.getDevice<MeterStruct>(serial);
+    if (ms.get() == nullptr) {
       PDebug.printf(PDebugLevel::WARN, "meterplugin: meter[%s] not found!",
                     serial.c_str());
       return;
@@ -149,14 +124,14 @@ public:
     }
   }
 
-  void publishAC(Meter &meter) {
+  void publishAC(MeterStruct *meter) {
     PDebug.printf(PDebugLevel::DEBUG, "meterplugin: publishPower[%s]: %f %s \n",
-                  meter.getSerial().c_str(), meter.getPower(),
-                  Units.toStr(meter.getUnit()));
+                  meter->getSerial().c_str(), meter->getPower(),
+                  Units.toStr(meter->getUnit()));
     MeterMessage m(*this);
-    m.power = meter.getPower();
-    m.serial = meter.getSerial();
-    m.unit = meter.getUnit();
+    m.power = meter->getPower();
+    m.serial = meter->getSerial();
+    m.unit = meter->getUnit();
     publishMessage(m);
   }
   void saveSettings(JsonObject settings) {
@@ -205,7 +180,7 @@ public:
   }
 
 private:
-  meterarray<MAX_NUM_METER> meters;
+  MetersStruct meters;
   std::map<String, String> topicMap;
   String meter_mqtt_topics;
   String meter_mqtt_json_topics;

@@ -93,6 +93,9 @@ public:
                     inverterId.c_str());
       return;
     }
+    PDebug.printf(PDebugLevel::DEBUG,
+                  "hoymilesplugin: inverter[%s] set powerlimit to %f W\n",
+                  inv->serialString().c_str(), limit);
     if (!allow_limitation) {
       PDebug.printf(PDebugLevel::INFO,
                     "hoymilesplugin: inverter[%s] set powerlimit not allowed\n",

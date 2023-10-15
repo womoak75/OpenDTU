@@ -17,13 +17,14 @@ public:
     init();
   }
   ~AvgPowercontrolAlgo() {}
-  virtual bool calcLimit(powercontrolstruct &powercontrol) {
+  virtual bool calcLimit(std::shared_ptr<PowerControlStruct> powercontrol) {
 
-    float newLimit = initialized ? getLimit(powercontrol.consumption,powercontrol.maxDiffW)
-                                 : powercontrol.consumption;
-    saveHistory(powercontrol.consumption, newLimit);
-    float threshold = std::abs(powercontrol.limit - newLimit);
-    if (threshold <= powercontrol.threshold) {
+    float newLimit = initialized ? getLimit(powercontrol->meters.getPower(),
+                                            powercontrol->maxDiffW)
+                                 : powercontrol->meters.getPower();
+    saveHistory(powercontrol->meters.getPower(), newLimit);
+    float threshold = std::abs(powercontrol->inverters.getLimit() - newLimit);
+    if (threshold <= powercontrol->threshold) {
       PDebug.printf(PDebugLevel::DEBUG,
                     "powercontrol AvgPowercontrolAlgo: newlimit(%f) within "
                     "threshold(%f) -> no limit change\n",
@@ -32,7 +33,7 @@ public:
       PDebug.printf(PDebugLevel::DEBUG,
                     "powercontrol AvgPowercontrolAlgo: setting limit to %f\n",
                     newLimit);
-      powercontrol.newLimit = newLimit;
+      powercontrol->inverters.setNewLimit(newLimit);
       return true;
     }
     return false;
