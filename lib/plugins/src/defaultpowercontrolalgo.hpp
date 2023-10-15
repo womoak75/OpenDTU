@@ -43,9 +43,10 @@ public:
     // todo: split by capacity of inverter?
     float limit = (newLimit / powercontrol->inverters.count());
     PDebug.printf(PDebugLevel::DEBUG,
-                    "powercontrol PowercontrolAlgo: split limit(%f) between inverters(%d) %f each\n",
-                    newLimit,powercontrol->inverters.count(),limit);
-    for(int i = 0; i < powercontrol->inverters.count(); i++)
+                  "powercontrol PowercontrolAlgo: split limit(%f) between "
+                  "inverters(%d) %f each\n",
+                  newLimit, powercontrol->inverters.count(), limit);
+    for (int i = 0; i < powercontrol->inverters.count(); i++)
       powercontrol->inverters[i]->setNewLimit(limit);
   }
 };

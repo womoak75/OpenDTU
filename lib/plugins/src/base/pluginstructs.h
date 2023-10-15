@@ -154,7 +154,7 @@ struct InverterStruct : PowerDeviceStruct {
     limitUpdate = true;
   }
   void setLimitTs(TIMESTAMP ts) { limitTs = ts; }
-  float getLimit() { return limitUpdate; }
+  float getLimit() { return limit; }
   bool isLimitUpdate() { return limitUpdate; }
   void clearLimitUpdate() { limitUpdate = false; }
 };
@@ -183,6 +183,18 @@ struct InvertersStruct : DevicesStruct<InverterStruct>, InverterStruct {
     for (auto dev : devices) {
       dev->clearUpdated();
     }
+  }
+  float getLimit() {
+    float f = 0;
+    for (auto dev : devices)
+      f += dev->getLimit();
+    return f;
+  }
+  float getNewLimit() {
+    float f = 0;
+    for (auto dev : devices)
+      f += dev->getNewLimit();
+    return f;
   }
 };
 

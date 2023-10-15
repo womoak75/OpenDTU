@@ -26,25 +26,36 @@ public:
   void loop() {
     for (int i = 0; i < powercontrollers.devices.size(); i++) {
       static unsigned long pccount = 0;
-      if(millis()-pccount>5000) {
+      if (millis() - pccount > 5000) {
         pccount = millis();
-        
+
         PDebug.printf(PDebugLevel::DEBUG,
-                      "powercontrol loop: powercontrollers[%d] ---\n",i);
-        PDebug.printf(PDebugLevel::DEBUG,
-                      "pc: updated=%d,initialized=%d \n",powercontrollers.devices[i]->isUpdated(),powercontrollers.devices[i]->isInitialized());
-       PDebug.printf(PDebugLevel::DEBUG,
-                      "meters: size:%d, updated=%d, \n",powercontrollers.devices[i]->meters.count(),powercontrollers.devices[i]->meters.isUpdated());
-       PDebug.printf(PDebugLevel::DEBUG,
-                      "inverters: size:%d, updated=%d, \n",powercontrollers.devices[i]->inverters.count(),powercontrollers.devices[i]->inverters.isUpdated());
-      /*
-      if (powercontrollers.devices[i]->isUpdated()) {
-        PDebug.printf(PDebugLevel::DEBUG,
-                      "powercontrol update: consumption=%f "
-                      "production=%f limit=XX\n",
-                      powercontrollers.devices[i]->meters.getPower(),
-                      powercontrollers.devices[i]->inverters.getPower());
-      } */
+                      "powercontrol loop: powercontrollers[%d] ---\n", i);
+        PDebug.printf(PDebugLevel::DEBUG, "pc: updated=%d,initialized=%d \n",
+                      powercontrollers.devices[i]->isUpdated(),
+                      powercontrollers.devices[i]->isInitialized());
+        PDebug.printf(PDebugLevel::DEBUG, "meters: size:%d, updated=%d, \n",
+                      powercontrollers.devices[i]->meters.count(),
+                      powercontrollers.devices[i]->meters.isUpdated());
+        PDebug.printf(PDebugLevel::DEBUG, "inverters: size:%d, updated=%d, \n",
+                      powercontrollers.devices[i]->inverters.count(),
+                      powercontrollers.devices[i]->inverters.isUpdated());
+        PDebug.printf(
+            PDebugLevel::DEBUG,
+            "inverters: limit=%f limitUpdated=%d, newLimit=%f "
+            "newLimitUpdated=%d \n",
+            powercontrollers.devices[i]->inverters.getLimit(),
+            powercontrollers.devices[i]->inverters.isLimitUpdate(),
+            powercontrollers.devices[i]->inverters.getNewLimit(),
+            powercontrollers.devices[i]->inverters.isNewLimitUpdate());
+        /*
+        if (powercontrollers.devices[i]->isUpdated()) {
+          PDebug.printf(PDebugLevel::DEBUG,
+                        "powercontrol update: consumption=%f "
+                        "production=%f limit=XX\n",
+                        powercontrollers.devices[i]->meters.getPower(),
+                        powercontrollers.devices[i]->inverters.getPower());
+        } */
       }
       if (powercontrollers.devices[i]->isInitialized()) {
         if (powercontrollers.devices[i]->meters.isUpdated()) {
