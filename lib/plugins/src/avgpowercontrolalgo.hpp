@@ -33,10 +33,23 @@ public:
       PDebug.printf(PDebugLevel::DEBUG,
                     "powercontrol AvgPowercontrolAlgo: setting limit to %f\n",
                     newLimit);
-      powercontrol->inverters.setNewLimit(newLimit);
+      setLimit(powercontrol,newLimit);
       return true;
     }
     return false;
+  }
+    void setLimit(std::shared_ptr<PowerControlStruct> &powercontrol,
+                float newLimit) {
+    // we split the limit among inverters
+    // not pretty smart if more than 1 is configured
+    // todo: split by capacity of inverter?
+    float limit = (newLimit / powercontrol->inverters.count());
+    PDebug.printf(PDebugLevel::DEBUG,
+                  "powercontrol PowercontrolAlgo: split limit(%f) between "
+                  "inverters(%d) %f each\n",
+                  newLimit, powercontrol->inverters.count(), limit);
+    for (int i = 0; i < powercontrol->inverters.count(); i++)
+      powercontrol->inverters[i]->setNewLimit(limit);
   }
 
 private:
