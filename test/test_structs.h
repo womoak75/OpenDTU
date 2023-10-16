@@ -11,6 +11,7 @@
 
 class StructTest {
 public:
+
   static void test_structs(void) {
     TEST_MESSAGE("test structs");
     DevicesStruct<DeviceStruct> devices;
@@ -26,7 +27,7 @@ public:
     InverterStruct s2("s2");
     s2.setPower(42);
     PowerControlStruct pwc("pwc");
-    pwc.limit = 123;
+
     devices.addDevice(m1);
     devices.addDevice(m2);
     devices.addDevice(s1);
@@ -65,46 +66,50 @@ public:
     TEST_ASSERT_EQUAL_STRING(m2.getSerial().c_str(),
                              met.get()->getSerial().c_str());
     TEST_ASSERT_EQUAL_FLOAT(m2.getPower(), met.get()->getPower());
-    auto inv = devices.getDevice<MeterStruct>(s1.getSerial());
+    auto inv = devices.getDevice<InverterStruct>(s1.getSerial());
     TEST_ASSERT_EQUAL_STRING(s1.getSerial().c_str(),
                              inv.get()->getSerial().c_str());
     TEST_ASSERT_EQUAL_FLOAT(s1.getPower(), inv.get()->getPower());
-    inv = devices.getDevice<MeterStruct>(s2.getSerial());
+    inv = devices.getDevice<InverterStruct>(s2.getSerial());
     TEST_ASSERT_EQUAL_STRING(s2.getSerial().c_str(),
                              inv.get()->getSerial().c_str());
     TEST_ASSERT_EQUAL_FLOAT(s2.getPower(), inv.get()->getPower());
+    String unknown = "m323";
+    auto npe = devices.getDevice<MeterStruct>(unknown);
+    TEST_ASSERT_NULL(npe.get());
+
     // meter
-    auto mmet = devices.getDevice<MeterStruct>(m1.getSerial());
+    auto mmet = meterdevices.getDevice<MeterStruct>(m1.getSerial());
     TEST_ASSERT_EQUAL_STRING(m1.getSerial().c_str(),
                              mmet.get()->getSerial().c_str());
     TEST_ASSERT_EQUAL_FLOAT(m1.getPower(), mmet.get()->getPower());
-    mmet = devices.getDevice<MeterStruct>(m2.getSerial());
+    mmet = meterdevices.getDevice<MeterStruct>(m2.getSerial());
     TEST_ASSERT_EQUAL_STRING(m2.getSerial().c_str(),
                              mmet.get()->getSerial().c_str());
     TEST_ASSERT_EQUAL_FLOAT(m2.getPower(), mmet.get()->getPower());
     // inverter
-    auto iinv = devices.getDevice<MeterStruct>(s1.getSerial());
+    auto iinv = inverterdevices.getDevice<InverterStruct>(s1.getSerial());
     TEST_ASSERT_EQUAL_STRING(s1.getSerial().c_str(),
                              iinv.get()->getSerial().c_str());
     TEST_ASSERT_EQUAL_FLOAT(s1.getPower(), iinv.get()->getPower());
-    iinv = devices.getDevice<MeterStruct>(s2.getSerial());
+    iinv = inverterdevices.getDevice<InverterStruct>(s2.getSerial());
     TEST_ASSERT_EQUAL_STRING(s2.getSerial().c_str(),
                              iinv.get()->getSerial().c_str());
     TEST_ASSERT_EQUAL_FLOAT(s2.getPower(), iinv.get()->getPower());
     // powerdevice
-    auto pmet = devices.getDevice<MeterStruct>(m1.getSerial());
+    auto pmet = powerdevices.getDevice<MeterStruct>(m1.getSerial());
     TEST_ASSERT_EQUAL_STRING(m1.getSerial().c_str(),
                              pmet.get()->getSerial().c_str());
     TEST_ASSERT_EQUAL_FLOAT(m1.getPower(), pmet.get()->getPower());
-    pmet = devices.getDevice<MeterStruct>(m2.getSerial());
+    pmet = powerdevices.getDevice<MeterStruct>(m2.getSerial());
     TEST_ASSERT_EQUAL_STRING(m2.getSerial().c_str(),
                              pmet.get()->getSerial().c_str());
     TEST_ASSERT_EQUAL_FLOAT(m2.getPower(), pmet.get()->getPower());
-    auto pinv = devices.getDevice<MeterStruct>(s1.getSerial());
+    auto pinv = powerdevices.getDevice<InverterStruct>(s1.getSerial());
     TEST_ASSERT_EQUAL_STRING(s1.getSerial().c_str(),
                              pinv.get()->getSerial().c_str());
     TEST_ASSERT_EQUAL_FLOAT(s1.getPower(), pinv.get()->getPower());
-    pinv = devices.getDevice<MeterStruct>(s2.getSerial());
+    pinv = powerdevices.getDevice<InverterStruct>(s2.getSerial());
     TEST_ASSERT_EQUAL_STRING(s2.getSerial().c_str(),
                              pinv.get()->getSerial().c_str());
     TEST_ASSERT_EQUAL_FLOAT(s2.getPower(), pinv.get()->getPower());
