@@ -54,8 +54,8 @@
                             <span v-else-if="typeof(value)==='boolean'">
                                 <input v-model="selectedPluginData[propertyName]" type="checkbox"/>
                             </span> 
-                            <span v-else-if="propertyName==='config'">
-                                <textarea v-on:change='updateConfig(propertyName)' :id="'configField' + propertyName">{{ JSON.stringify(selectedPluginData[propertyName], null, 2) }}</textarea>
+                            <span v-else-if="propertyName===pluginconfig">
+                                <textarea v-model="selectedPluginConfig[selectedPluginData[pluginname]]"></textarea>
                             </span> 
                             <span v-else>
                                 <input v-model="selectedPluginData[propertyName]" type="text" maxlength="384"/>
@@ -109,11 +109,14 @@ export default defineComponent({
             modal: {} as bootstrap.Modal,
             newPluginData: {},
             selectedPluginData: {} as object,
+            selectedPluginConfig: {},
             plugins: [],
             dataLoading: true,
             alert: {} as AlertResponse,
             sortable: {} as Sortable,
-            el: {}
+            el: {},
+            pluginname: "name" as never,
+            pluginconfig: "config" as never
         };
     },
     mounted() {
@@ -162,12 +165,17 @@ export default defineComponent({
                 });
         },
         onEditSubmit() {
+            this.configStr2Json((this.selectedPluginData as any)[this.pluginname],this.pluginconfig);
             this.callPluginApiEndpoint("edit", JSON.stringify(this.selectedPluginData));
             this.onCloseModal(this.modal);
         },
         onOpenModal(modal: bootstrap.Modal, pplugin: {}) {
             // deep copy object for editing/deleting
             this.selectedPluginData = JSON.parse(JSON.stringify(pplugin));
+            if(this.selectedPluginData[this.pluginconfig]!==null) {
+                (this.selectedPluginConfig as any)[this.selectedPluginData[this.pluginname]] = 
+                JSON.stringify(this.selectedPluginData[this.pluginconfig],null,2);
+            }
             modal.show();
         },
         onCloseModal(modal: bootstrap.Modal) {
@@ -176,13 +184,13 @@ export default defineComponent({
         onSaveOrder() {
             this.callPluginApiEndpoint("order", JSON.stringify({ order: this.sortable.toArray() }));
         },
-        updateConfig(propertyName: string) {
-            var configD;
+        configStr2Json(pluginName: string, propertyName: string) {
+            
             try { 
-                configD = (<HTMLInputElement>document.getElementById("configField"+propertyName)!).value!;
+                var configD = (this.selectedPluginConfig as any)[pluginName];
                 (this.selectedPluginData as any)[propertyName] = JSON.parse(configD);
-                console.log(configD)
-            } catch (err) {console.log(configD);}
+                
+            } catch(error) { /* */ }
         }
     },
 });
