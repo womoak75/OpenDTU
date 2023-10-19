@@ -134,11 +134,11 @@ public:
     m.unit = meter->getUnit();
     publishMessage(m);
   }
-  void saveSettings(JsonObject settings) {
+  void saveSettings(JsonObject& settings) {
     settings[F("meter_mqtt_topics")] = meter_mqtt_topics;
     settings[F("meter_mqtt_json_topics")] = meter_mqtt_json_topics;
   }
-  void loadSettings(JsonObject settings) {
+  void loadSettings(JsonObject& settings) {
     if (settings.containsKey(F("meter_mqtt_json_topics"))) {
       meter_mqtt_json_topics =
           settings[F("meter_mqtt_json_topics")].as<String>();

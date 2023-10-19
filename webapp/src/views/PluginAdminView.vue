@@ -53,11 +53,13 @@
                             </span>
                             <span v-else-if="typeof(value)==='boolean'">
                                 <input v-model="selectedPluginData[propertyName]" type="checkbox"/>
-                            </span>
+                            </span> 
+                            <span v-else-if="propertyName==='config'">
+                                <textarea v-on:change='updateConfig(propertyName)' :id="'configField' + propertyName">{{ JSON.stringify(selectedPluginData[propertyName], null, 2) }}</textarea>
+                            </span> 
                             <span v-else>
-                                <input v-model="selectedPluginData[propertyName]" type="text" maxlength="32"/>
+                                <input v-model="selectedPluginData[propertyName]" type="text" maxlength="384"/>
                             </span>
-                            
                             </p>
                         </div>
                     </form>
@@ -111,10 +113,12 @@ export default defineComponent({
             dataLoading: true,
             alert: {} as AlertResponse,
             sortable: {} as Sortable,
+            el: {}
         };
     },
     mounted() {
         this.modal = new bootstrap.Modal('#pluginEdit');
+        this.el = document;
     },
     created() {
         this.getPlugins();
@@ -172,6 +176,14 @@ export default defineComponent({
         onSaveOrder() {
             this.callPluginApiEndpoint("order", JSON.stringify({ order: this.sortable.toArray() }));
         },
+        updateConfig(propertyName: string) {
+            var configD;
+            try { 
+                configD = (<HTMLInputElement>document.getElementById("configField"+propertyName)!).value!;
+                (this.selectedPluginData as any)[propertyName] = JSON.parse(configD);
+                console.log(configD)
+            } catch (err) {console.log(configD);}
+        }
     },
 });
 </script>

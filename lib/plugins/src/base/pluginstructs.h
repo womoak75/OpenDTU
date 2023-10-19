@@ -51,6 +51,7 @@ template <typename T> struct DevicesStruct {
     return b;
   }
   int count() { return devices.size(); }
+  void clear() { devices.clear(); }
 };
 
 struct PowerDeviceStruct : DeviceStruct {
@@ -203,6 +204,7 @@ struct PowerControlStruct : DeviceStruct {
   MetersStruct meters;
   int threshold = 0;
   int maxDiffW = 0;
+  String algo;
   bool initialized = false;
 
   PowerControlStruct(String &&s)

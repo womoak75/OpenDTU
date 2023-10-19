@@ -197,12 +197,12 @@ public:
     }
   }
 
-  void saveSettings(JsonObject settings) {
+  void saveSettings(JsonObject& settings) {
     settings[F("allow_limitation")] = allow_limitation;
     settings[F("limit_minimum_w")] = limit_minimum_w;
   }
 
-  void loadSettings(JsonObject settings) {
+  void loadSettings(JsonObject& settings) {
     if (settings.containsKey(F("allow_limitation")))
       allow_limitation = settings[F("allow_limitation")];
     if (settings.containsKey(F("limit_minimum_w")))

@@ -157,36 +157,58 @@ public:
     }
   }
 
-  void initPowercontrol() {
-    PowerControlStruct powercontrol("pc1");
-    InverterStruct inverter(inverter_serial);
-    powercontrol.inverters.addDevice(inverter);
-    MeterStruct meter(meter_serial);
-    powercontrol.meters.addDevice(meter);
-    powercontrol.threshold = threshold;
-    powercontrol.maxDiffW = maxDiffW;
-    powercontrollers.addDevice(powercontrol);
+  void initPowercontrol(const JsonArray &obj) {
+    // [{"id":"pc2","meters":[{"id":"1234"]},"inverters":[{"id":"1188484848"],"threshold":20,"maxdiffw":20,"algo":"default"}]
+    PDebug.printf(PDebugLevel::INFO, "powercontrol init size:%d\n", obj.size());
+    powercontrollers.clear();
+    for (int i = 0; i < obj.size(); i++) {
+      JsonObject pc = obj[i];
+
+      PowerControlStruct powercontrol(pc[F("id")].as<String>());
+      JsonArray inverters = pc[F("inverters")];
+      for (auto i : inverters) {
+        InverterStruct inverter(i[F("id")].as<String>());
+        powercontrol.inverters.addDevice(inverter);
+      }
+      JsonArray meters = pc[F("meters")];
+      for (auto m : meters) {
+        MeterStruct meter(m[F("id")].as<String>());
+        powercontrol.meters.addDevice(meter);
+      }
+      powercontrol.threshold = pc[F("threshold")];
+      powercontrol.maxDiffW = pc[F("maxdiffw")];
+      powercontrol.algo = pc[F("algo")].as<String>();
+      powercontrollers.addDevice(powercontrol);
+    }
   }
-  void saveSettings(JsonObject settings) {
-    settings[F("meter_serial")] = meter_serial;
-    settings[F("inverter_serial")] = inverter_serial;
-    settings[F("threshold")] = threshold;
-    settings[F("max_diff_w")] = maxDiffW;
+  void saveSettings(JsonObject &settings) {
+    JsonObject pc = settings.createNestedObject(F("config"));
+    JsonArray pcnode = pc.createNestedArray(F("pc"));
+    for (int i = 0; i < powercontrollers.count(); i++) {
+      auto pc = powercontrollers[i];
+      auto node = pcnode.createNestedObject();
+      node[F("id")] = pc->serial;
+      node[F("threshold")] = pc->threshold;
+      node[F("maxdiffw")] = pc->maxDiffW;
+      node[F("algo")] = pc->algo;
+      auto meters = node.createNestedArray(F("meters"));
+      for (int j = 0; j < pc->meters.count(); j++) {
+        auto meter = meters.createNestedObject();
+        meter[F("id")].set(pc->meters[j]->serial);
+      }
+      auto inverters = node.createNestedArray(F("inverters"));
+      for (int j = 0; j < pc->inverters.count(); j++) {
+        auto inverter = inverters.createNestedObject();
+        inverter[F("id")].set(pc->inverters[j]->serial);
+      }
+    }
   }
-  void loadSettings(JsonObject settings) {
-    if (settings.containsKey(F("meter_serial"))) {
-      meter_serial = settings[F("meter_serial")].as<String>();
+  void loadSettings(JsonObject &settings) {
+    if (settings.containsKey(F("config"))) {
+      JsonObject root = settings[F("config")];
+      JsonArray node = root[F("pc")];
+      initPowercontrol(node);
     }
-    if (settings.containsKey(F("inverter_serial"))) {
-      inverter_serial = settings[F("inverter_serial")].as<String>();
-    }
-    if (settings.containsKey(F("threshold"))) {
-      threshold = settings[F("threshold")];
-    }
-    if (settings.containsKey(F("max_diff_w"))) {
-      maxDiffW = settings[F("max_diff_w")];
-    }
-    initPowercontrol();
   }
 
 private:

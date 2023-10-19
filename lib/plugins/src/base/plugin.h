@@ -20,8 +20,8 @@ public:
   int getId();
   const char *getName();
   bool isEnabled();
-  void loadPluginSettings(JsonObject s);
-  void savePluginSettings(JsonObject s);
+  void loadPluginSettings(JsonObject& s);
+  void savePluginSettings(JsonObject& s);
   void setSystem(System<Plugin> *s);
   bool isSubscribed(const std::shared_ptr<PluginMessage> &m);
 
@@ -75,13 +75,13 @@ public:
    *
    * @param settings - jsonobject with plugin config
    */
-  virtual void loadSettings(JsonObject settings);
+  virtual void loadSettings(JsonObject& settings);
   /**
    * called when settings are saved
    *
    * @param settings - jsonobject for plugin config
    */
-  virtual void saveSettings(JsonObject settings);
+  virtual void saveSettings(JsonObject& settings);
 
 protected:
   /**

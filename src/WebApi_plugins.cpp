@@ -69,6 +69,7 @@ void WebApiPluginsClass::onPluginRequest(AsyncWebServerRequest* request)
         request->send(response);
         return;
     }
+    doc.shrinkToFit();
     JsonObject root = doc.as<JsonObject>();
     Plugin* p = Plugins.getPluginByName(root["plugin"]);
     if (p == NULL) {
@@ -143,6 +144,7 @@ void WebApiPluginsClass::onPluginEdit(AsyncWebServerRequest* request)
         request->send(response);
         return;
     }
+    doc.shrinkToFit();
     JsonObject root = doc.as<JsonObject>();
 
     if (!root.containsKey("name")) {
