@@ -159,7 +159,6 @@ public:
 
   void initPowercontrol(const JsonArray &obj) {
     // [{"id":"pc2","meters":[{"id":"1234"]},"inverters":[{"id":"1188484848"],"threshold":20,"maxdiffw":20,"algo":"default"}]
-    PDebug.printf(PDebugLevel::INFO, "powercontrol init size:%d\n", obj.size());
     powercontrollers.clear();
     for (int i = 0; i < obj.size(); i++) {
       JsonObject pc = obj[i];
