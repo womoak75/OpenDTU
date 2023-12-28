@@ -90,7 +90,7 @@ void PluginsClass::addCustomPlugins() {
   // plugins.push_back(std::make_unique<{PluginClassName}>({PluginClassName}()));
 }
 
-void PluginsClass::init() {
+void PluginsClass::init(Scheduler& scheduler) {
   pluginSystem.setMqttPublishCb(
       std::bind(&PluginsClass::publishMqtt, this, std::placeholders::_1,
                 std::placeholders::_2, std::placeholders::_3,
@@ -110,6 +110,11 @@ void PluginsClass::init() {
                           0,              /* Priority of the task */
                           &pluginTask,    /* Task handle. */
                           0);             /* Core where the task should run */
+#else 
+    scheduler.addTask(_loopTask);
+    _loopTask.setCallback(std::bind(&PluginsClass::loop, this));
+    _loopTask.setIterations(TASK_FOREVER);
+    _loopTask.enable();
 #endif
   PDebug.printf(PDebugLevel::INFO, "PluginsClass::init\n");
 }
