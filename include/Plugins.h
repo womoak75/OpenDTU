@@ -10,6 +10,7 @@
 #include <cstdint>
 #include <functional>
 #include <list>
+#include <TaskSchedulerDeclarations.h>
 
 class PluginConfigurator : public SystemConfigurator<Plugin> {
   public:
@@ -23,7 +24,7 @@ class PluginsClass {
 public:
   PluginsClass();
   ~PluginsClass();
-  void init();
+  void init(Scheduler& scheduler);
   void loop();
   void loopSystem();
   void subscribeMqtt(int id, const char *topic, bool append);
@@ -44,6 +45,7 @@ private:
 
   TaskHandle_t pluginTask;
   PluginSystem pluginSystem;
+  Task _loopTask;
 };
 
 extern PluginsClass Plugins;
