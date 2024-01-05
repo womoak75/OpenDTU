@@ -18,7 +18,6 @@ Find the
 
 Original idea was to dynamically control my Hoymiles inverter to enable a zero export to grid (Nulleinspeisung).
 
-<<<<<<< HEAD
 ![overview](docs/pp/overview.svg)
 
 However, I had to learn C++ first! :)  
@@ -37,26 +36,6 @@ So i can continue producing core dumps.
 * experimental: use core1 of ESP32 (on dualcore hardware)
 
 ## the architecture
-=======
-The documentation can be found [here](https://tbnobody.github.io/OpenDTU-docs/).
-Please feel free to support and create a PR in [this](https://github.com/tbnobody/OpenDTU-docs) repository to make the documentation even better.
-
-## Breaking changes
-
-Generated using: `git log --date=short --pretty=format:"* %h%x09%ad%x09%s" | grep BREAKING`
-
-```code
-* 71d1b3b       2023-11-07      BREAKING CHANGE: Home Assistant Auto Discovery to new naming scheme
-* 04f62e0       2023-04-20      BREAKING CHANGE: Web API Endpoint /api/eventlog/status no nested serial object
-* 59f43a8       2023-04-17      BREAKING CHANGE: Web API Endpoint /api/devinfo/status requires GET parameter inv=
-* 318136d       2023-03-15      BREAKING CHANGE: Updated partition table: Make sure you have a configuration backup and completly reflash the device!
-* 3b7aef6       2023-02-13      BREAKING CHANGE: Web API!
-* d4c838a       2023-02-06      BREAKING CHANGE: Prometheus API!
-* daf847e       2022-11-14      BREAKING CHANGE: Removed deprecated config parsing method
-* 69b675b       2022-11-01      BREAKING CHANGE: Structure WebAPI /api/livedata/status changed
-* 27ed4e3       2022-10-31      BREAKING: Change power factor from percent value to value between 0 and 1
-```
->>>>>>> 69cf63ed5e902da0374068d98b58d04e9db5e9c4
 
 ### sw parts
 
@@ -67,7 +46,6 @@ executed within the main application software loop function (more or less).
 A Plugin can send and receive messages.
 Messages can be send to a specific receiver or to all (broadcast).
 
-<<<<<<< HEAD
 ![singlereceiver](docs/pp/singlereceiver.svg)
 
 #### direct message exchange
@@ -205,9 +183,6 @@ send message
 ```
 mosquitto_pub -h mqttserver -t "public/topic" -m "hello plugin!"
 ```
-=======
-
->>>>>>> 69cf63ed5e902da0374068d98b58d04e9db5e9c4
 
 ### send json message to plugin
 
@@ -232,7 +207,6 @@ public:
     return false;
   }
 
-<<<<<<< HEAD
   void loop() {
     if (update) {
       update = false;
@@ -534,21 +508,3 @@ MyCustomPlugin: inverterCallback MeterMessage{base=PluginMessage{sender:2, recei
 
 
 
-=======
-### Change pin assignment
-
-Its possible to change all the pins of the NRF24L01+ module, the Display, the LED etc.
-The recommend way to change the pin assignment is by creating a custom [device profile](docs/DeviceProfiles.md).
-It is also possible to create a custom environment and compile the source yourself. This can be achieved by copying one of the [env:....] sections from 'platformio.ini' to 'platformio_override.ini' and editing the 'platformio_override.ini' file and add/change one or more of the following lines to the 'build_flags' parameter:
-
-```makefile
--DHOYMILES_PIN_MISO=19
--DHOYMILES_PIN_MOSI=23
--DHOYMILES_PIN_SCLK=18
--DHOYMILES_PIN_IRQ=16
--DHOYMILES_PIN_CE=4
--DHOYMILES_PIN_CS=5
-```
-
-It is recommended to make all changes only in the  'platformio_override.ini', this is your personal copy.
->>>>>>> 69cf63ed5e902da0374068d98b58d04e9db5e9c4
