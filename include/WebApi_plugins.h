@@ -2,10 +2,11 @@
 #pragma once
 
 #include <ESPAsyncWebServer.h>
+#include <TaskSchedulerDeclarations.h>
 
 class WebApiPluginsClass {
 public:
-    void init(AsyncWebServer& server);
+    void init(AsyncWebServer& server, Scheduler &scheduler);
     void loop();
 
 private:

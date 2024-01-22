@@ -12,7 +12,7 @@
 #include "helper.h"
 #include <AsyncJson.h>
 
-void WebApiPluginsClass::init(AsyncWebServer& server)
+void WebApiPluginsClass::init(AsyncWebServer& server, Scheduler &scheduler)
 {
     using std::placeholders::_1;
 
