@@ -12,11 +12,11 @@
 #include "helper.h"
 #include <AsyncJson.h>
 
-void WebApiPluginsClass::init(AsyncWebServer* server)
+void WebApiPluginsClass::init(AsyncWebServer& server, Scheduler &scheduler)
 {
     using std::placeholders::_1;
 
-    _server = server;
+    _server = &server;
 
     _server->on("/api/plugin/list", HTTP_GET, std::bind(&WebApiPluginsClass::onPluginList, this, _1));
     // _server->on("/api/inverter/add", HTTP_POST, std::bind(&WebApiPluginsClass::onInverterAdd, this, _1));

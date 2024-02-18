@@ -4,6 +4,7 @@
 #include <AsyncWebSocket.h>
 #include <HardwareSerial.h>
 #include <Stream.h>
+#include <TaskSchedulerDeclarations.h>
 #include <mutex>
 
 #define BUFFER_SIZE 500
@@ -23,10 +24,11 @@ public:
 
 class MessageOutputClass : public Print {
 public:
-  void loop();
-  size_t write(uint8_t c) override;
-  size_t write(const uint8_t *buffer, size_t size) override;
-  void register_ws_output(AsyncWebSocket *output);
+    MessageOutputClass();
+    void init(Scheduler& scheduler);
+    size_t write(uint8_t c) override;
+    size_t write(const uint8_t* buffer, size_t size) override;
+    void register_ws_output(AsyncWebSocket* output);
 
   template <typename... Args> size_t printf(const char *f, Args... args) {
     return printf(MessageOutputDebugLevel::DEBUG_DEBUG, f, args...);
@@ -61,13 +63,18 @@ public:
   bool isLevel(MessageOutputDebugLevel l) { return (l <= level); }
 
 private:
-  AsyncWebSocket *_ws = NULL;
-  char _buffer[BUFFER_SIZE];
-  uint16_t _buff_pos = 0;
-  uint32_t _lastSend = 0;
-  bool _forceSend = false;
-  MessageOutputDebugLevel level = MessageOutputDebugLevel::DEBUG_DEBUG;
-  std::mutex _msgLock;
+    void loop();
+
+    Task _loopTask;
+
+    AsyncWebSocket* _ws = nullptr;
+    char _buffer[BUFFER_SIZE];
+    uint16_t _buff_pos = 0;
+    uint32_t _lastSend = 0;
+    bool _forceSend = false;
+
+    std::mutex _msgLock;
+    MessageOutputDebugLevel level = MessageOutputDebugLevel::DEBUG_DEBUG;
 };
 
 extern MessageOutputClass MessageOutput;
