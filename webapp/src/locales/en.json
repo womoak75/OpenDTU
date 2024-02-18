@@ -436,8 +436,8 @@
         "Action": "Action",
         "EditPlugin": "Edit",
         "Name": "Plugin",
-        "Save": "@:dtuadmin.Save",
-        "Cancel": "@:maintenancereboot.Cancel"
+        "Save": "@:base.Save",
+        "Cancel": "@:base.Cancel"
     },
     "mqttadmin": {
         "MqttSettings": "MQTT Settings",
