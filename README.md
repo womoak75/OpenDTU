@@ -47,7 +47,6 @@ A Plugin can send and receive messages.
 Messages can be send to a specific receiver or to all (broadcast).
 
 ![singlereceiver](docs/pp/singlereceiver.svg)
-
 #### direct message exchange
 
 Each message is send to it's receiver(s) directly, like a syncron function call.  
