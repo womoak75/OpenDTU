@@ -161,7 +161,7 @@ export default defineComponent({
             this.callPluginApiEndpoint("edit", JSON.stringify(this.selectedPluginData));
             this.onCloseModal(this.modal);
         },
-        onOpenModal(modal: bootstrap.Modal, pplugin: {}) {
+        onOpenModal(modal: bootstrap.Modal, pplugin: object) {
             // deep copy object for editing/deleting
             this.selectedPluginData = JSON.parse(JSON.stringify(pplugin));
             modal.show();
