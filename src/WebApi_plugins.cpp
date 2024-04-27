@@ -90,7 +90,7 @@ void WebApiPluginsClass::onPluginList(AsyncWebServerRequest* request)
     if (!WebApi.checkCredentials(request)) {
         return;
     }
-    AsyncJsonResponse* response = new AsyncJsonResponse(false, 4096U);
+    AsyncJsonResponse* response = new AsyncJsonResponse(false);
     JsonObject root = response->getRoot();
     JsonArray plugins = root.createNestedArray(F("plugins"));
     for (int i = 0; i < Plugins.getPluginCount(); i++) {
