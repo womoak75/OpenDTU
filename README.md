@@ -26,8 +26,7 @@ So i can continue producing core dumps.
 
 ## what did i (try to) implement/use?
 
-* extensive use of c++ templates
-* data exchange between software modules via messaging (loose coupling)
+* extensive use of c++ templates * data exchange between software modules via messaging (loose coupling)
 * multiple data exchange strategies (direct / singlequeue / multiqueue)
 * basic plugins (meter/inverter/powercontrol/mqtt)
 * minimalistic generic configuration via webui
@@ -501,9 +500,5 @@ Somewhere in the monitor output your debug statement can be found.
 MyCustomPlugin: inverterCallback MeterMessage{base=PluginMessage{sender:2, receiver:0}, meterId=112123456789, power=155.0, unit=W}
 
 ...
-
-
-
-
 
 
