@@ -46,46 +46,48 @@
                                 {{ $t('pluginadmin.Plugin') }}
                             </label>
                             <p v-for="(value, propertyName) in selectedPluginData" :key="propertyName">
-                            <!-- {{ propertyName }}:{{ value }}:{{ idx }} -->
-                            <label class="col-sm-2 col-form-label">{{ propertyName }}: </label>
-                            <span v-if="typeof(value)==='number'" >
-                                <input v-model="selectedPluginData[propertyName]" type="number"/>
-                            </span>
-                            <span v-else-if="typeof(value)==='boolean'">
-                                <input v-model="selectedPluginData[propertyName]" type="checkbox"/>
-                            </span>
-                            <span v-else>
-                                <input v-model="selectedPluginData[propertyName]" type="text" maxlength="32"/>
-                            </span>
-                            
+                                <!-- {{ propertyName }}:{{ value }}:{{ idx }} -->
+                                <label class="col-sm-2 col-form-label">{{ propertyName }}: </label>
+                                <span v-if="typeof value === 'number'">
+                                    <input v-model="selectedPluginData[propertyName]" type="number" />
+                                </span>
+                                <span v-else-if="typeof value === 'boolean'">
+                                    <input v-model="selectedPluginData[propertyName]" type="checkbox" />
+                                </span>
+                                <span v-else>
+                                    <input v-model="selectedPluginData[propertyName]" type="text" maxlength="32" />
+                                </span>
                             </p>
                         </div>
                     </form>
-
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" @click="onCloseModal(modal)"
-                        data-bs-dismiss="modal">{{ $t('pluginadmin.Cancel') }}</button>
+                    <button
+                        type="button"
+                        class="btn btn-secondary"
+                        @click="onCloseModal(modal)"
+                        data-bs-dismiss="modal"
+                    >
+                        {{ $t('pluginadmin.Cancel') }}
+                    </button>
                     <button type="button" class="btn btn-primary" @click="onEditSubmit">
-                        {{ $t('pluginadmin.Save') }}</button>
+                        {{ $t('pluginadmin.Save') }}
+                    </button>
                 </div>
             </div>
         </div>
     </div>
-
 </template>
 
 <script lang="ts">
 import BasePage from '@/components/BasePage.vue';
-import BootstrapAlert from "@/components/BootstrapAlert.vue";
+import BootstrapAlert from '@/components/BootstrapAlert.vue';
 import CardElement from '@/components/CardElement.vue';
 import Sortable from 'sortablejs';
 import { authHeader, handleResponse } from '@/utils/authentication';
 import * as bootstrap from 'bootstrap';
 
-import {
-    BIconPencil
-} from 'bootstrap-icons-vue';
+import { BIconPencil } from 'bootstrap-icons-vue';
 import { defineComponent } from 'vue';
 
 declare interface AlertResponse {
@@ -122,7 +124,7 @@ export default defineComponent({
     methods: {
         getPlugins() {
             this.dataLoading = true;
-            fetch("/api/plugin/list", { headers: authHeader() })
+            fetch('/api/plugin/list', { headers: authHeader() })
                 .then((response) => handleResponse(response, this.$emitter, this.$router))
                 .then((data) => {
                     this.plugins = data.plugins;
@@ -142,10 +144,10 @@ export default defineComponent({
         },
         callPluginApiEndpoint(endpoint: string, jsonData: string) {
             const formData = new FormData();
-            formData.append("data", jsonData);
+            formData.append('data', jsonData);
 
-            fetch("/api/plugin/" + endpoint, {
-                method: "POST",
+            fetch('/api/plugin/' + endpoint, {
+                method: 'POST',
                 headers: authHeader(),
                 body: formData,
             })
@@ -158,7 +160,7 @@ export default defineComponent({
                 });
         },
         onEditSubmit() {
-            this.callPluginApiEndpoint("edit", JSON.stringify(this.selectedPluginData));
+            this.callPluginApiEndpoint('edit', JSON.stringify(this.selectedPluginData));
             this.onCloseModal(this.modal);
         },
         onOpenModal(modal: bootstrap.Modal, pplugin: object) {
@@ -170,7 +172,7 @@ export default defineComponent({
             modal.hide();
         },
         onSaveOrder() {
-            this.callPluginApiEndpoint("order", JSON.stringify({ order: this.sortable.toArray() }));
+            this.callPluginApiEndpoint('order', JSON.stringify({ order: this.sortable.toArray() }));
         },
     },
 });

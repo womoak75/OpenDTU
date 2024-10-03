@@ -125,7 +125,7 @@ export default defineComponent({
                 return 'https://github.com/womoak75/OpenDTU/commits/' + this.systemStatus.git_hash;
             }
             return 'https://github.com/womoak75/OpenDTU/releases/tag/' + this.systemStatus.git_hash;
-        }
+        },
     },
 });
 </script>

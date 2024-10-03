@@ -78,8 +78,8 @@ export default defineComponent({
                 return;
             }
 
-            const fetchUrl = 'https://api.github.com/repos/womoak75/OpenDTU/compare/'
-                + this.systemDataList.git_hash + '...HEAD';
+            const fetchUrl =
+                'https://api.github.com/repos/womoak75/OpenDTU/compare/' + this.systemDataList.git_hash + '...HEAD';
 
             fetch(fetchUrl)
                 .then((response) => {

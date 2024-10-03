@@ -122,7 +122,7 @@ const router = createRouter({
         {
             path: '/settings/plugin',
             name: 'Plugin',
-            component: PluginAdminView
+            component: PluginAdminView,
         },
     ],
 });
