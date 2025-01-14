@@ -84,6 +84,9 @@ bool PluginConfigurationClass::read(Plugin* p)
     char path[32];
     snprintf(path,sizeof(path),"/%s",p->getName());
     File f = LittleFS.open(path, "r", false);
+    if(!f) {
+        return false;
+    }
     DynamicJsonDocument doc(PLUGIN_JSON_BUFFER_SIZE);
     // Deserialize the JSON document
     DeserializationError error = deserializeJson(doc, f);

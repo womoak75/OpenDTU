@@ -15,14 +15,22 @@ import NetworkAdminView from '@/views/NetworkAdminView.vue';
 import NetworkInfoView from '@/views/NetworkInfoView.vue';
 import NtpAdminView from '@/views/NtpAdminView.vue';
 import NtpInfoView from '@/views/NtpInfoView.vue';
+import PluginAdminView from '@/views/PluginAdminView.vue';
 import SecurityAdminView from '@/views/SecurityAdminView.vue';
 import SystemInfoView from '@/views/SystemInfoView.vue';
-import PluginAdminView from '@/views/PluginAdminView.vue';
+import WaitRestartView from '@/views/WaitRestartView.vue';
 import { createRouter, createWebHistory } from 'vue-router';
 
 const router = createRouter({
     history: createWebHistory(import.meta.env.BASE_URL),
     linkActiveClass: 'active',
+    scrollBehavior() {
+        return new Promise((resolve) => {
+            setTimeout(() => {
+                resolve({ top: 0 });
+            }, 100);
+        });
+    },
     routes: [
         {
             path: '/',
@@ -123,6 +131,11 @@ const router = createRouter({
             path: '/settings/plugin',
             name: 'Plugin',
             component: PluginAdminView,
+        },
+        {
+            path: '/wait',
+            name: 'Wait Restart',
+            component: WaitRestartView,
         },
     ],
 });
