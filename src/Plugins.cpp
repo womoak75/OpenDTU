@@ -69,7 +69,7 @@ void PluginsClass::loopSystem() { pluginSystem.loop(); }
 void PluginsClass::loop() {
 #ifndef ESPSINGLECORE
 #else
-  loopSystem();
+  //loopSystem();
 #endif
 }
 
@@ -98,8 +98,8 @@ void PluginsClass::init(Scheduler& scheduler) {
   pluginSystem.setMqttSubscribeCb(
       std::bind(&PluginsClass::subscribeMqtt, this, std::placeholders::_1,
                 std::placeholders::_2, std::placeholders::_3));
-  MessageOutput.setLevel(MessageOutputDebugLevel::DEBUG_INFO);
-  PDebug.setPrint(&MessageOutput);
+  //MessageOutput.setLevel(MessageOutputDebugLevel::DEBUG_INFO);
+  //PDebug.setPrint(&MessageOutput);
   pluginSystem.init();
 
 #ifndef ESPSINGLECORE
@@ -110,7 +110,7 @@ void PluginsClass::init(Scheduler& scheduler) {
                           0,              /* Priority of the task */
                           &pluginTask,    /* Task handle. */
                           0);             /* Core where the task should run */
-#else 
+#else
     scheduler.addTask(_loopTask);
     _loopTask.setCallback(std::bind(&PluginsClass::loop, this));
     _loopTask.setIterations(TASK_FOREVER);
